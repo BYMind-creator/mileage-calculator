@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>里程報銷計算器 v2</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif; }
+  details > summary { list-style: none; }
+  details > summary::-webkit-details-marker { display: none; }
+  details[open] .arrow { transform: rotate(90deg); }
+  .arrow { transition: transform 0.2s; display: inline-block; }
+</style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+<div class="max-w-2xl mx-auto p-4 md:p-8">
+
+  <header class="mb-6">
+    <h1 class="text-2xl md:text-3xl font-bold text-gray-900">🚗 里程報銷計算器</h1>
+    <p class="text-gray-600 text-sm mt-1">全自動：輸入起終點地址 → Google Maps 自動算公里數與報銷金額</p>
+    <p class="text-gray-400 text-xs mt-1">v2 · Google Maps JavaScript API · 純前端</p>
+  </header>
+
+  <!-- API Key Setup -->
+  <section id="apiKeySection" class="bg-orange-50 border border-orange-300 rounded-xl shadow-sm p-4 md:p-5 mb-4">
+    <details id="apiKeyDetails">
+      <summary class="cursor-pointer font-medium text-orange-900 select-none flex items-center justify-between">
+        <span><span class="arrow">▶</span> 🔑 Google Maps API Key 設定</span>
+        <span id="apiKeyStatus" class="text-xs font-normal text-orange-700"></span>
+      </summary>
+      <div class="mt-3">
+        <input id="apiKey" type="password" placeholder="貼上你的 API Key（AIzaSy... 開頭）" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm font-mono">
+        <p class="text-xs text-gray-600 mt-2">第一次使用要設定一次，會記在這台瀏覽器（localStorage）。<br>申請步驟請看 <code class="bg-orange-100 px-1 rounded">setup_guide.md</code></p>
+        <div class="mt-2 flex gap-2 flex-wrap">
+          <button id="saveKeyBtn" class="bg-orange-600 hover:bg-orange-700 text-white text-sm px-4 py-2 rounded-lg">儲存</button>
+          <button id="clearKeyBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded-lg">清除</button>
+          <span id="keySavedMsg" class="hidden self-center text-green-700 text-sm font-medium">✅ 已儲存</span>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- Main form -->
+  <section class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 md:p-6 mb-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">業務員姓名</label>
+        <input id="staffName" type="text" placeholder="例：王小明" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">日期</label>
+        <input id="tripDate" type="date" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+      </div>
+    </div>
+    <div class="mb-3">
+      <label class="block text-sm font-medium text-gray-700 mb-1">起點地址 <span class="text-red-500">*</span></label>
+      <input id="origin" type="text" placeholder="例：台北市信義區市府路1號" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-medium text-gray-700 mb-1">終點地址 <span class="text-red-500">*</span></label>
+      <input id="destination" type="text" placeholder="例：新北市板橋區中山路一段161號" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">每公里費率（NT$）</label>
+        <input id="rate" type="number" value="7" min="0" step="0.5" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm">
+      </div>
+      <div class="flex items-end">
+        <label class="inline-flex items-center text-sm text-gray-700 cursor-pointer pb-2">
+          <input id="roundTrip" type="checkbox" class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+          <span class="ml-2">來回（往返同一路線）</span>
+        </label>
+      </div>
+    </div>
+
+    <button id="calculateBtn" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium px-4 py-3 rounded-lg transition text-sm disabled:opacity-50 disabled:cursor-not-allowed">
+      🚀 自動計算公里數與金額
+    </button>
+  </section>
+
+  <div id="loading" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 text-blue-800 text-sm">
+    ⏳ 計算中，請稍候...
+  </div>
+
+  <div id="error" class="hidden bg-red-50 border border-red-200 rounded-lg p-3 mb-4 text-red-800 text-sm"></div>
+
+  <section id="result" class="hidden bg-white rounded-xl shadow-sm border border-gray-200 p-5 md:p-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-3">📊 計算結果</h2>
+
+    <div id="addressResolved" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-3 mb-3 text-xs text-blue-900 space-y-1"></div>
+    
+    <div class="mb-3">
+      <label class="block text-sm font-medium text-gray-700 mb-1">
+        單程公里數 <span class="text-xs text-gray-500 font-normal">（自動帶入，可手動修正）</span>
+      </label>
+      <input id="distanceKm" type="number" step="0.1" min="0" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-base font-semibold">
+    </div>
+    
+    <div class="bg-gray-50 rounded-lg p-4 space-y-2 mb-4">
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-600">總公里數</span>
+        <span id="totalKm" class="font-medium text-gray-900">-</span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-600">每公里費率</span>
+        <span id="rateDisplay" class="font-medium text-gray-900">-</span>
+      </div>
+      <div class="flex justify-between pt-2 border-t border-gray-200">
+        <span class="font-medium text-gray-900">報銷金額</span>
+        <span id="totalAmount" class="text-2xl font-bold text-blue-600">-</span>
+      </div>
+    </div>
+
+    <button id="copyBtn" class="w-full bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-medium px-4 py-2.5 rounded-lg transition text-sm">
+      📋 複製報帳記錄
+    </button>
+    
+    <p id="copySuccess" class="hidden text-green-600 text-sm mt-2 text-center font-medium">✅ 已複製，可貼到 Excel 或表單</p>
+  </section>
+
+  <section class="mt-6 bg-amber-50 border border-amber-200 rounded-lg p-4 text-sm text-amber-900">
+    <p class="font-medium mb-2">💡 使用說明</p>
+    <ul class="list-disc list-inside space-y-1 text-xs">
+      <li>第一次使用：先點「🔑 API Key 設定」貼上 key（一次設定即可）</li>
+      <li>填好業務員、日期、起終點地址 → 點「🚀 自動計算」</li>
+      <li>系統會自動帶出公里數，可手動修正；改費率/勾來回，金額會即時重算</li>
+      <li>「📋 複製報帳記錄」會把整筆資料格式化複製到剪貼簿</li>
+    </ul>
+  </section>
+
+</div>
+
+<script>
+  // ╔═══════════════════════════════════════════════════════════╗
+  // ║  ⚙️  設定區：把你的 Google Maps API Key 埋在這裡            ║
+  // ║                                                            ║
+  // ║  ▸ 把下面引號裡的內容換成你的 key                          ║
+  // ║    例：const HARDCODED_API_KEY = 'AIzaSyABCD1234...';       ║
+  // ║                                                            ║
+  // ║  ▸ 留空（''）的話，會顯示輸入框讓使用者自己貼              ║
+  // ║                                                            ║
+  // ║  ⚠️  Key 一定要在 Google Cloud Console 設好 Referrer 限制   ║
+  // ║      （setup_guide.md Step 6），否則被偷會被燒帳單         ║
+  // ╚═══════════════════════════════════════════════════════════╝
+  const HARDCODED_API_KEY = '';
+  // ═══════════════════════════════════════════════════════════════
+
+  const STORAGE_KEY = 'mileage_calc_api_key';
+  let apiKey = '';
+  
+  // ===== DOM =====
+  const els = {
+    apiKey: document.getElementById('apiKey'),
+    apiKeyStatus: document.getElementById('apiKeyStatus'),
+    apiKeyDetails: document.getElementById('apiKeyDetails'),
+    saveKeyBtn: document.getElementById('saveKeyBtn'),
+    clearKeyBtn: document.getElementById('clearKeyBtn'),
+    keySavedMsg: document.getElementById('keySavedMsg'),
+    staffName: document.getElementById('staffName'),
+    tripDate: document.getElementById('tripDate'),
+    origin: document.getElementById('origin'),
+    destination: document.getElementById('destination'),
+    distanceKm: document.getElementById('distanceKm'),
+    roundTrip: document.getElementById('roundTrip'),
+    rate: document.getElementById('rate'),
+    calculateBtn: document.getElementById('calculateBtn'),
+    copyBtn: document.getElementById('copyBtn'),
+    loading: document.getElementById('loading'),
+    error: document.getElementById('error'),
+    result: document.getElementById('result'),
+    addressResolved: document.getElementById('addressResolved'),
+    singleKm: document.getElementById('singleKm'),
+    totalKm: document.getElementById('totalKm'),
+    rateDisplay: document.getElementById('rateDisplay'),
+    totalAmount: document.getElementById('totalAmount'),
+    copySuccess: document.getElementById('copySuccess'),
+  };
+
+  // ===== 工具 =====
+  function showError(msg) {
+    els.error.textContent = '❌ ' + msg;
+    els.error.classList.remove('hidden');
+    els.loading.classList.add('hidden');
+  }
+
+  function hideError() {
+    els.error.classList.add('hidden');
+  }
+
+  function safeStorageGet(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function safeStorageSet(key, val) {
+    try { localStorage.setItem(key, val); return true; } catch (e) { return false; }
+  }
+  function safeStorageRemove(key) {
+    try { localStorage.removeItem(key); } catch (e) {}
+  }
+
+  function updateApiKeyStatus() {
+    if (apiKey) {
+      els.apiKeyStatus.textContent = `✅ 已設定（${apiKey.slice(0, 8)}...）`;
+    } else {
+      els.apiKeyStatus.textContent = '⚠️ 尚未設定';
+    }
+  }
+
+  // ===== Key 管理 =====
+  if (HARDCODED_API_KEY) {
+    // 埋 key 模式：直接用、隱藏設定區塊
+    apiKey = HARDCODED_API_KEY;
+    const apiKeySection = document.getElementById('apiKeySection');
+    if (apiKeySection) apiKeySection.style.display = 'none';
+  } else {
+    // 輸入框模式：從 localStorage 讀，沒有就讓使用者貼
+    apiKey = safeStorageGet(STORAGE_KEY) || '';
+    if (apiKey) {
+      els.apiKey.value = apiKey;
+      els.apiKeyDetails.open = false;
+    } else {
+      els.apiKeyDetails.open = true;
+    }
+    updateApiKeyStatus();
+  }
+
+  els.saveKeyBtn.addEventListener('click', () => {
+    const v = els.apiKey.value.trim();
+    if (!v) {
+      showError('請貼上 API Key');
+      return;
+    }
+    apiKey = v;
+    const saved = safeStorageSet(STORAGE_KEY, v);
+    updateApiKeyStatus();
+    els.keySavedMsg.textContent = saved ? '✅ 已儲存' : '✅ 已設定（本次有效，瀏覽器不支援儲存）';
+    els.keySavedMsg.classList.remove('hidden');
+    setTimeout(() => els.keySavedMsg.classList.add('hidden'), 2500);
+    hideError();
+  });
+
+  els.clearKeyBtn.addEventListener('click', () => {
+    apiKey = '';
+    els.apiKey.value = '';
+    safeStorageRemove(STORAGE_KEY);
+    updateApiKeyStatus();
+    els.apiKeyDetails.open = true;
+  });
+
+  // ===== Google Maps API 載入 =====
+  let mapsLoadPromise = null;
+  function loadMapsAPI() {
+    if (window.google?.maps?.DistanceMatrixService) return Promise.resolve();
+    if (mapsLoadPromise) return mapsLoadPromise;
+    
+    mapsLoadPromise = new Promise((resolve, reject) => {
+      const callbackName = '__gmapsLoaded' + Date.now();
+      let timeoutId;
+      
+      window[callbackName] = () => {
+        clearTimeout(timeoutId);
+        delete window[callbackName];
+        if (window.google?.maps?.DistanceMatrixService) {
+          resolve();
+        } else {
+          reject(new Error('API 載入完成但找不到 DistanceMatrixService'));
+        }
+      };
+      
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(apiKey)}&callback=${callbackName}&language=zh-TW&region=TW&loading=async`;
+      script.async = true;
+      script.onerror = () => {
+        clearTimeout(timeoutId);
+        delete window[callbackName];
+        mapsLoadPromise = null;
+        reject(new Error('無法載入 Google Maps（網路問題或 API Key 無效）'));
+      };
+      
+      // 攔截 Google Maps 內部錯誤訊息
+      const originalGmAuthFailure = window.gm_authFailure;
+      window.gm_authFailure = () => {
+        clearTimeout(timeoutId);
+        delete window[callbackName];
+        mapsLoadPromise = null;
+        reject(new Error('API Key 驗證失敗（請檢查 Key 是否正確、Maps JavaScript API 是否啟用、Referrer 限制是否符合）'));
+        if (originalGmAuthFailure) originalGmAuthFailure();
+      };
+      
+      document.head.appendChild(script);
+      
+      timeoutId = setTimeout(() => {
+        delete window[callbackName];
+        mapsLoadPromise = null;
+        reject(new Error('Maps API 載入逾時（15 秒），請檢查網路'));
+      }, 15000);
+    });
+    
+    return mapsLoadPromise;
+  }
+
+  function calculateDistance(origin, destination) {
+    return new Promise((resolve, reject) => {
+      const service = new google.maps.DistanceMatrixService();
+      service.getDistanceMatrix({
+        origins: [origin],
+        destinations: [destination],
+        travelMode: google.maps.TravelMode.DRIVING,
+        unitSystem: google.maps.UnitSystem.METRIC,
+        region: 'TW',
+        language: 'zh-TW'
+      }, (response, status) => {
+        if (status !== 'OK') {
+          const msgs = {
+            'OVER_QUERY_LIMIT': '超過用量配額（請檢查 Google Cloud Quota）',
+            'REQUEST_DENIED': 'API 拒絕請求（請確認 Distance Matrix API 已啟用、API Key Referrer 限制符合）',
+            'INVALID_REQUEST': '請求參數錯誤',
+            'UNKNOWN_ERROR': '未知錯誤，請稍後再試',
+          };
+          reject(new Error(msgs[status] || `API 錯誤：${status}`));
+          return;
+        }
+        const el = response.rows?.[0]?.elements?.[0];
+        if (!el || el.status !== 'OK') {
+          const msgs = {
+            'NOT_FOUND': '找不到地址（請確認起終點地址是否完整、含縣市與門牌號）',
+            'ZERO_RESULTS': '兩地之間找不到可行駛路線',
+          };
+          reject(new Error(msgs[el?.status] || `查詢失敗：${el?.status || '未知'}`));
+          return;
+        }
+        resolve({
+          km: el.distance.value / 1000,
+          duration: el.duration.text,
+          originResolved: response.originAddresses[0],
+          destResolved: response.destinationAddresses[0],
+        });
+      });
+    });
+  }
+
+  // ===== 計算流程 =====
+  els.calculateBtn.addEventListener('click', async () => {
+    if (!apiKey) {
+      showError('請先設定 API Key（點上方「🔑 Google Maps API Key 設定」）');
+      els.apiKeyDetails.open = true;
+      return;
+    }
+    
+    const origin = els.origin.value.trim();
+    const destination = els.destination.value.trim();
+    if (!origin || !destination) {
+      showError('請輸入起點與終點地址');
+      return;
+    }
+
+    hideError();
+    els.loading.classList.remove('hidden');
+    els.result.classList.add('hidden');
+    els.calculateBtn.disabled = true;
+
+    try {
+      await loadMapsAPI();
+      const r = await calculateDistance(origin, destination);
+      
+      els.distanceKm.value = r.km.toFixed(1);
+      els.addressResolved.innerHTML = `📍 系統解析的地址：<br>　起：${r.originResolved}<br>　終：${r.destResolved}<br>🕐 預估行車時間：${r.duration}`;
+      els.addressResolved.classList.remove('hidden');
+      updateResult();
+      
+      els.loading.classList.add('hidden');
+      els.result.classList.remove('hidden');
+    } catch (err) {
+      showError(err.message);
+    } finally {
+      els.calculateBtn.disabled = false;
+    }
+  });
+
+  // ===== 結果即時計算 =====
+  function updateResult() {
+    const km = parseFloat(els.distanceKm.value) || 0;
+    const isRoundTrip = els.roundTrip.checked;
+    const rate = parseFloat(els.rate.value) || 0;
+    const totalKm = isRoundTrip ? km * 2 : km;
+    const amount = totalKm * rate;
+    
+    els.totalKm.textContent = km > 0 ? `${totalKm.toFixed(1)} 公里 ${isRoundTrip ? '（來回）' : '（單程）'}` : '-';
+    els.rateDisplay.textContent = `NT$ ${rate} / 公里`;
+    els.totalAmount.textContent = `NT$ ${Math.round(amount).toLocaleString()}`;
+  }
+
+  [els.distanceKm, els.roundTrip, els.rate].forEach(el => {
+    el.addEventListener('input', updateResult);
+    el.addEventListener('change', updateResult);
+  });
+
+  // ===== 複製記錄 =====
+  els.copyBtn.addEventListener('click', async () => {
+    const km = parseFloat(els.distanceKm.value) || 0;
+    if (km <= 0) {
+      showError('沒有公里數可複製');
+      return;
+    }
+    
+    const staff = els.staffName.value.trim() || '(未填)';
+    const date = els.tripDate.value || '(未填)';
+    const origin = els.origin.value.trim();
+    const destination = els.destination.value.trim();
+    const isRoundTrip = els.roundTrip.checked;
+    const rate = parseFloat(els.rate.value) || 0;
+    const totalKm = isRoundTrip ? km * 2 : km;
+    const amount = Math.round(totalKm * rate);
+
+    const record = `日期：${date}
+業務員：${staff}
+起點：${origin}
+終點:${destination}
+單程：${km.toFixed(1)} 公里
+總公里數：${totalKm.toFixed(1)} 公里${isRoundTrip ? '（來回）' : '（單程）'}
+費率：NT$ ${rate} / 公里
+報銷金額：NT$ ${amount.toLocaleString()}`;
+
+    let copied = false;
+    try {
+      if (navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(record);
+        copied = true;
+      }
+    } catch (e) {}
+    
+    if (!copied) {
+      const ta = document.createElement('textarea');
+      ta.value = record;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); copied = true; } catch (e) {}
+      document.body.removeChild(ta);
+    }
+
+    if (copied) {
+      els.copySuccess.classList.remove('hidden');
+      setTimeout(() => els.copySuccess.classList.add('hidden'), 2500);
+    } else {
+      showError('複製失敗，請手動選取結果文字');
+    }
+  });
+
+  // ===== 初始化 =====
+  els.tripDate.valueAsDate = new Date();
+  updateResult();
+</script>
+</body>
+</html>
