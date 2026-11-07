@@ -1,0 +1,585 @@
+這裡無法直接附加檔案，以下是完整 HTML。複製後存成 `travel-studio-home.html`，用瀏覽器打開即可。表單右下角的方形郵戳已改回原設計樣式；明信片封面的方形章，等文字確定後再加。
+
+```html
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Studio</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Sans+TC:wght@400;500&family=Courier+Prime&display=swap" rel="stylesheet">
+<style>
+/* ========== 配色 token ========== */
+:root{
+  --paper:#F8F4E9;--ink:#302A25;--accent:#B86B45;--card:#FFFDF8;
+  --board:#EFE6D3;--frame:#CDBB98;--pin:#A9833A;--guide:#E8D9B4;--guide-line:#B89E6A;
+  --line:rgba(48,42,37,.2);--soft:rgba(48,42,37,.74);--danger:#A32D2D;
+  --live:#3B5A40;--live-bg:#EEF3EC;--live-line:#8EA98F;--deco-stamp:#A33A2A;
+  --serif:"Noto Serif TC",Georgia,serif;
+  --sans:"Noto Sans TC",system-ui,-apple-system,sans-serif;
+  --mono:"Courier Prime","Noto Sans TC",ui-monospace,monospace;
+}
+body[data-theme=kraft]{--paper:#E8DDC5;--ink:#594431;--accent:#A5794C;--card:#F6EFE0;--board:#DDCFB2;--frame:#B89E78;--guide:#E2D2AC;--line:rgba(89,68,49,.22);--soft:rgba(89,68,49,.8)}
+body[data-theme=peach]{--paper:#FFF0E8;--ink:#6F4C40;--accent:#DF8B7E;--card:#FFFAF6;--board:#F7E2D6;--frame:#E3B9A6;--pin:#C9735F;--guide:#FCE7DC;--guide-line:#E3B9A6;--line:rgba(111,76,64,.2);--soft:rgba(111,76,64,.82)}
+body[data-theme=sage]{--paper:#EAF0E7;--ink:#344B3B;--accent:#8EA98F;--card:#F8FBF6;--board:#DCE6D8;--frame:#A9BEA8;--pin:#5E7A62;--guide:#E3ECDF;--guide-line:#A9BEA8;--line:rgba(52,75,59,.2);--soft:rgba(52,75,59,.82)}
+body[data-theme=ocean]{--paper:#E6F1F7;--ink:#2E4B61;--accent:#7DAFCE;--card:#F7FBFD;--board:#D6E7F0;--frame:#9EC0D6;--pin:#4C7A99;--guide:#DDEBF3;--guide-line:#9EC0D6;--line:rgba(46,75,97,.2);--soft:rgba(46,75,97,.82)}
+
+/* ========== 基礎 ========== */
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);transition:background-color .2s}
+p{margin:0}
+button{font-family:var(--sans);cursor:pointer;color:inherit}
+a{color:inherit}
+button:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.meta{font:13px/1.65 var(--sans);color:var(--soft)}
+.mono{font:12px var(--mono);letter-spacing:.08em;color:var(--soft)}
+.wrap{max-width:1160px;margin:0 auto;padding:0 28px}
+
+/* ========== 原型切換列（正式版移除） ========== */
+.proto{background:#302A25;color:#F8F4E9;font:13px var(--sans);padding:6px 0}
+.proto .wrap{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.proto button{background:transparent;color:#F8F4E9;border:1px solid rgba(248,244,233,.4);border-radius:3px;padding:3px 10px;font-size:13px}
+.proto button[aria-pressed=true]{background:#F8F4E9;color:#302A25}
+
+/* ========== 頁首 ========== */
+header{border-bottom:1px solid var(--line);background:var(--paper);position:relative;z-index:20}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-top:14px;padding-bottom:14px}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo b{background:var(--ink);color:var(--paper);font:500 13px var(--sans);padding:4px 6px}
+.logo .name{font-size:22px}
+.logo .mono{font-size:11px;margin-left:6px}
+.tabs{display:flex;gap:6px;font:14px var(--sans)}
+.tabs a{padding:7px 12px;text-decoration:none}
+.tabs a[aria-current=page]{background:var(--ink);color:var(--paper)}
+.tabs a:not([aria-current]):hover{background:var(--line)}
+.tools{display:flex;gap:10px;align-items:center}
+.seg{display:flex;border:1px solid var(--line)}
+.seg button{border:none;background:transparent;color:var(--soft);padding:0 10px;height:36px;font-size:13px}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.icob{background:transparent;border:1px solid var(--line);width:38px;height:38px;font-size:18px;display:inline-flex;align-items:center;justify-content:center}
+.icob:hover{border-color:var(--ink)}
+.gbtn{background:var(--card);border:1.5px solid var(--ink);box-shadow:3px 3px 0 var(--ink);height:38px;padding:0 14px;font-size:13px;display:inline-flex;gap:6px;align-items:center}
+.gbtn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.menubtn{display:none}
+.pop{position:relative}
+.panel{display:none;position:absolute;right:0;top:46px;background:var(--card);border:1.5px solid var(--ink);box-shadow:4px 4px 0 var(--line);padding:6px;min-width:170px;z-index:30}
+.panel.open{display:block}
+.panel button,.panel a{display:flex;align-items:center;gap:10px;width:100%;border:none;background:transparent;padding:9px 8px;font:14px var(--sans);text-decoration:none;text-align:left}
+.panel button:hover,.panel a:hover{background:var(--line)}
+.panel button[aria-checked=true]::after{content:"✓";margin-left:auto}
+.swatch{width:16px;height:16px;border:4px solid;flex:none}
+
+/* ========== 主要版面 ========== */
+main{background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:22px 22px}
+main .wrap{display:grid;grid-template-columns:360px minmax(0,1fr);gap:36px;padding-top:44px;padding-bottom:56px;align-items:start}
+
+/* 夾板表單 */
+.clip{background:var(--frame);padding:32px 12px 22px;border-radius:5px;position:relative;margin-top:20px}
+.clip-metal{position:absolute;top:-22px;left:50%;margin-left:-48px;width:96px;height:40px;background:#8A6A3A;border:2px solid #6B5029;border-radius:3px}
+.clip-metal::after{content:"";position:absolute;left:18px;right:18px;top:7px;height:10px;border:2px solid #C9A86A;border-radius:2px}
+.sheet{background:var(--card);padding:24px 22px;position:relative}
+.torn{height:10px;background:linear-gradient(135deg,var(--card) 33%,transparent 33%) 0 0/14px 14px,linear-gradient(225deg,var(--card) 33%,transparent 33%) 0 0/14px 14px}
+.sheet-top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sheet-top .mono{background:var(--board);padding:3px 8px}
+.saved{display:inline-flex;align-items:center;gap:4px}
+.saved i{color:#5f7a64}
+.sheet h1{font-size:28px;font-weight:600;margin:14px 0 2px;line-height:1.3}
+.rule{border-top:1px dashed var(--soft);margin:16px 0 2px}
+.flabel{display:block;font:12px var(--mono);letter-spacing:.04em;color:var(--soft);margin:16px 0 6px}
+.field{position:relative}
+.field i{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--soft);pointer-events:none}
+input{width:100%;height:46px;padding:0 12px;border:1.5px solid var(--ink);box-shadow:3px 3px 0 var(--ink);background:#fff;color:#302A25;font:16px var(--sans);border-radius:0;-webkit-appearance:none;appearance:none}
+.field input{padding-left:40px}
+input[aria-invalid=true]{border-color:var(--danger);box-shadow:3px 3px 0 var(--danger)}
+.dates{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.err{font:13px var(--sans);color:var(--danger);margin-top:6px;display:none}
+.err.show{display:block}
+.preview{margin-top:14px;border-left:3px solid var(--accent);padding:2px 0 2px 10px}
+.cta{width:100%;min-height:52px;margin-top:22px;background:var(--ink);color:var(--paper);border:none;box-shadow:4px 4px 0 var(--accent);padding:12px 14px;font-size:15px;display:flex;align-items:center;gap:10px}
+.cta:active{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--accent)}
+.cta .seal{background:var(--accent);color:#fff;font:13px var(--serif);padding:3px 6px;min-width:28px;text-align:center}
+.cta .txt{flex:1;text-align:left}
+.ok{display:none;margin-top:12px;font:13px var(--sans);background:var(--board);padding:8px 10px}
+.ok.show{display:block}
+.line-note{margin-top:16px;border:1px dashed var(--soft);padding:8px 10px;display:flex;gap:8px;align-items:flex-start}
+.line-note b{font:500 10px var(--sans);color:#06A94D;border:1px solid #06A94D;padding:0 4px;margin-top:3px;flex:none}
+.form-foot{margin-top:12px;padding-right:80px}
+
+/* 方形裝飾郵戳（原設計樣式，不代表狀態） */
+.deco-stamp{position:absolute;right:-16px;bottom:-26px;z-index:2;transform:rotate(-10deg);
+  background:var(--card);border:2px solid var(--deco-stamp);border-radius:4px;padding:3px;color:var(--deco-stamp);pointer-events:none}
+.deco-stamp div{border:1px dashed var(--deco-stamp);padding:5px 9px;text-align:center;font:10px/1.35 var(--mono);letter-spacing:.1em}
+.deco-stamp strong{display:block;font:600 14px/1.2 var(--serif);letter-spacing:.06em;font-style:italic}
+
+/* 軟木板 */
+.board{background:var(--board);border:10px solid var(--frame);padding:32px 28px;position:relative}
+.pin{position:absolute;width:12px;height:12px;background:var(--pin);border:1px solid rgba(0,0,0,.25)}
+.pin.tl{top:-6px;left:-6px}.pin.tr{top:-6px;right:-6px}.pin.bl{bottom:-6px;left:-6px}.pin.br{bottom:-6px;right:-6px}
+
+/* 便條卡 */
+.note{background:var(--card);border:1.5px solid var(--ink);padding:28px 26px;position:relative;box-shadow:4px 4px 0 var(--line)}
+.note-tab{position:absolute;top:-13px;left:28px;width:54px;height:22px;background:#7A5A2E;border:1px solid #5A421F}
+.note-tab::after{content:"";position:absolute;left:8px;right:8px;top:9px;height:3px;background:#C9A86A}
+.note-label{position:absolute;top:-11px;right:20px;background:#F3E3B5;color:#302A25;border:1px solid var(--soft);font:11px var(--mono);letter-spacing:.08em;padding:2px 8px;transform:rotate(2deg)}
+.chip{display:inline-block;background:var(--ink);color:var(--paper);font:11px var(--mono);letter-spacing:.08em;padding:3px 8px}
+.note h2{font-size:30px;font-weight:600;line-height:1.3;margin:12px 0 6px}
+.note-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.live{font:12px var(--sans);color:var(--live);background:var(--live-bg);border:1px solid var(--live-line);padding:3px 10px;display:inline-flex;gap:6px;align-items:center}
+.live i{width:7px;height:7px;background:#3B8A4E;display:inline-block}
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:22px}
+.step{border-top:3px solid var(--accent);padding-top:10px}
+.step h3{font-size:17px;font-weight:600;margin:4px 0 6px;display:flex;gap:6px;align-items:center}
+.resume{display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:24px;align-items:end}
+.progress{border:1.5px solid var(--ink);background:var(--paper);padding:12px 14px;margin-top:16px}
+.progress-row{display:flex;justify-content:space-between}
+.track{height:9px;background:var(--line);margin-top:8px}
+.fill{height:9px;background:var(--ink)}
+.avatars{display:flex;align-items:center;margin-top:12px;flex-wrap:wrap;gap:8px 0}
+.avatars span{width:26px;height:26px;font:11px var(--sans);display:inline-flex;align-items:center;justify-content:center;color:#fff;margin-right:-6px;border:2px solid var(--card)}
+.avatars .meta{margin-left:16px}
+.actions{display:flex;flex-direction:column;gap:10px}
+.btn-dark{background:var(--ink);color:var(--paper);border:none;box-shadow:3px 3px 0 var(--accent);min-height:44px;padding:0 16px;font:14px var(--sans);display:inline-flex;gap:8px;align-items:center;justify-content:center;text-decoration:none}
+.btn-dark:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--accent)}
+.btn-light{background:var(--card);border:1px solid var(--soft);min-height:44px;padding:0 14px;font-size:14px;display:inline-flex;gap:8px;align-items:center;justify-content:center}
+.btn-light:hover{border-color:var(--ink)}
+
+/* 明信片 */
+.sec{display:flex;align-items:center;gap:10px;margin:34px 0 22px;padding-top:20px;border-top:1px dashed var(--soft)}
+.sec b{width:11px;height:11px;background:#A33A2A;flex:none}
+.sec h2{font-size:20px;font-weight:600;margin:0}
+.sec h2.mono-title{font:15px var(--mono);letter-spacing:.08em;color:var(--ink)}
+.sec a{margin-left:auto;font:13px var(--sans);color:var(--soft)}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:30px}
+.pc{--r:-1.2deg;background:var(--card);border:1.5px solid var(--ink);padding:12px 12px 14px;position:relative;box-shadow:4px 4px 0 var(--line);transform:rotate(var(--r))}
+.pc:hover{animation:wobble .55s ease-out forwards}
+@keyframes wobble{
+  0%{transform:rotate(var(--r)) translateY(0)}
+  30%{transform:rotate(calc(var(--r) + 2deg)) translateY(-4px)}
+  60%{transform:rotate(calc(var(--r) - 1deg)) translateY(-4px)}
+  100%{transform:rotate(calc(var(--r) * .3)) translateY(-4px)}
+}
+.tack{position:absolute;top:-6px;left:14px;width:13px;height:13px;border:1px solid rgba(0,0,0,.3)}
+.washi{position:absolute;top:-9px;width:62px;height:17px;opacity:.5}
+.cover{height:150px;border:1px solid var(--line);display:grid;grid-template-columns:1fr 76px}
+.cover .main-part{background:var(--board);padding:14px 16px;display:flex;align-items:flex-end}
+.cover .dest{font-size:36px;font-weight:600;line-height:1}
+.cover .stub{background:var(--board);border-left:2px dashed var(--soft);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font:13px/1.3 var(--mono);text-align:center}
+.cover-photo{height:150px;border:1px solid var(--line);position:relative;background-size:cover;background-position:center}
+.cover-photo .dur{position:absolute;top:10px;left:10px;background:var(--ink);color:var(--paper);font:12px var(--mono);padding:2px 8px}
+.pc-row{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px}
+.pc-row h3{font-size:19px;font-weight:600;margin:0}
+.vis{font:12px var(--sans);border:1px solid var(--ink);padding:1px 7px;display:inline-flex;gap:4px;align-items:center;white-space:nowrap}
+.pc-foot{border-top:1px dashed var(--soft);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.pc-foot .btn-dark{min-height:38px;padding:0 12px;font-size:13px}
+
+/* 使用備忘 */
+.guide{background:var(--guide);border:1.5px solid var(--guide-line);padding:18px;margin-top:34px}
+.guide-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:14px}
+.guide-grid div{background:var(--card);border:1px solid var(--line);padding:12px}
+.guide-grid h3{font:500 14px var(--sans);margin:0 0 4px}
+.privacy{margin-top:12px;display:flex;align-items:center;gap:6px}
+
+/* 頁尾 */
+footer{border-top:1px solid var(--line);background:var(--paper)}
+footer .wrap{display:grid;grid-template-columns:1.2fr 1fr 1fr;align-items:center;gap:20px;padding-top:22px;padding-bottom:24px}
+footer .links{display:flex;gap:18px;flex-wrap:wrap;font:13px var(--sans)}
+footer .links a{text-decoration:none;color:var(--soft)}
+footer .links a:hover{color:var(--ink);text-decoration:underline}
+footer .copy{text-align:right}
+
+/* ========== 平板 ========== */
+@media (max-width:1023px){
+  .wrap{padding:0 24px}
+  main .wrap{grid-template-columns:minmax(0,1fr);gap:40px;padding-top:34px}
+  .row3{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:12px}
+  .row3 .dates{display:contents}
+  .guide-grid{grid-template-columns:1fr 1fr}
+  .deco-stamp{right:-6px}
+  body.returning .clip{order:2}
+  body.returning .board{order:1}
+}
+/* ========== 手機 ========== */
+@media (max-width:719px){
+  .wrap{padding:0 14px}
+  .tabs{display:none}
+  .menubtn{display:inline-flex}
+  .logo .mono{display:none}
+  .logo .name{font-size:19px}
+  .gbtn .txt{display:none}
+  .gbtn{padding:0 11px}
+  .seg button{padding:0 8px}
+  main .wrap{padding-top:28px;padding-bottom:36px;gap:36px}
+  .row3{display:block}
+  .row3 .dates{display:grid}
+  .sheet{padding:20px 16px}
+  .sheet h1{font-size:25px}
+  .deco-stamp{right:-4px;bottom:-22px}
+  .board{border-width:6px;padding:26px 12px}
+  .note{padding:24px 16px}
+  .note h2{font-size:23px}
+  .steps{grid-template-columns:1fr 1fr;gap:16px}
+  .resume{grid-template-columns:1fr}
+  .actions{flex-direction:row}
+  .actions .btn-dark{flex:1}
+  .cards{grid-template-columns:1fr}
+  footer .wrap{grid-template-columns:1fr;gap:12px}
+  footer .copy{text-align:left}
+}
+@media (prefers-reduced-motion:reduce){
+  .pc:hover{animation:none;transform:rotate(var(--r)) translateY(-4px)}
+  body{transition:none}
+}
+</style>
+</head>
+<body data-theme="paper">
+
+<!-- 原型狀態切換：正式版刪除此區塊 -->
+<div class="proto" role="region" aria-label="Prototype">
+  <div class="wrap">
+    <span data-i="protoLabel"></span>
+    <button id="stNew" aria-pressed="true" data-i="protoNew"></button>
+    <button id="stBack" aria-pressed="false" data-i="protoBack"></button>
+  </div>
+</div>
+
+<header>
+  <div class="wrap">
+    <a class="logo" href="#" aria-label="Travel Studio"><b>TS</b><span class="name">Travel Studio</span><span class="mono" data-i="sub"></span></a>
+
+    <nav class="tabs" aria-label="Main">
+      <a href="#" aria-current="page" data-i="nav1"></a>
+      <a href="#" data-i="nav2"></a>
+      <a href="#" data-i="nav3"></a>
+    </nav>
+
+    <div class="tools">
+      <div class="seg" role="group" aria-label="Language">
+        <button id="langZh" aria-pressed="true">繁中</button>
+        <button id="langEn" aria-pressed="false">EN</button>
+      </div>
+      <div class="pop">
+        <button class="icob" id="themeBtn" aria-haspopup="true" aria-expanded="false"><i class="ti ti-palette" aria-hidden="true"></i></button>
+        <div class="panel" id="themePanel" role="menu"></div>
+      </div>
+      <button class="gbtn"><i class="ti ti-brand-google" aria-hidden="true"></i><span class="txt" data-i="login"></span></button>
+      <div class="pop menubtn">
+        <button class="icob" id="menuBtn" aria-haspopup="true" aria-expanded="false"><i class="ti ti-menu-2" aria-hidden="true"></i></button>
+        <div class="panel" id="menuPanel" role="menu">
+          <a href="#" role="menuitem" data-i="nav1"></a>
+          <a href="#" role="menuitem" data-i="nav2"></a>
+          <a href="#" role="menuitem" data-i="nav3"></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <!-- 夾板表單 -->
+    <div class="clip">
+      <div class="clip-metal" aria-hidden="true"></div>
+      <form class="sheet" id="tripForm" novalidate>
+        <div class="sheet-top">
+          <span class="mono" id="dispatch"></span>
+          <span class="meta saved"><i class="ti ti-point-filled" aria-hidden="true"></i><span data-i="autosave"></span></span>
+        </div>
+        <h1 data-i="h1"></h1>
+        <p class="meta" style="font-size:14px" data-i="lead"></p>
+        <div class="rule"></div>
+
+        <div class="row3">
+          <div>
+            <label class="flabel" for="dest" data-i="lDest"></label>
+            <div class="field"><i class="ti ti-map-pin" aria-hidden="true"></i><input id="dest" autocomplete="off" aria-describedby="errDest"></div>
+            <p class="err" id="errDest" role="alert" data-i="errDest"></p>
+          </div>
+          <div class="dates">
+            <div>
+              <label class="flabel" for="startDate" data-i="lStart"></label>
+              <input type="date" id="startDate">
+            </div>
+            <div>
+              <label class="flabel" for="endDate" data-i="lEnd"></label>
+              <input type="date" id="endDate" aria-describedby="errDate">
+            </div>
+          </div>
+        </div>
+        <p class="err" id="errDate" role="alert"></p>
+        <p class="meta preview" id="preview" aria-live="polite"></p>
+
+        <label class="flabel" for="tripName" data-i="lName"></label>
+        <div class="field"><i class="ti ti-pencil" aria-hidden="true"></i><input id="tripName" maxlength="40"></div>
+
+        <button class="cta" type="submit"><span class="seal" data-i="seal"></span><span class="txt" data-i="cta"></span><i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+        <p class="ok" id="okMsg" role="status"></p>
+
+        <div class="line-note"><b>LINE</b><p class="meta" data-i="lineNote"></p></div>
+        <p class="meta form-foot" data-i="formFoot"></p>
+
+        <!-- 方形裝飾郵戳：不代表任何狀態 -->
+        <div class="deco-stamp" aria-hidden="true"><div><span>TRAVEL STUDIO</span><strong data-i="stampMid"></strong><span id="stampBottom"></span></div></div>
+      </form>
+      <div class="torn" aria-hidden="true"></div>
+    </div>
+
+    <!-- 軟木板 -->
+    <section class="board" aria-labelledby="boardTitle">
+      <i class="pin tl"></i><i class="pin tr"></i><i class="pin bl"></i><i class="pin br"></i>
+      <div id="boardContent"></div>
+
+      <div class="guide">
+        <p class="mono"><i class="ti ti-pin" aria-hidden="true"></i> <span data-i="guideTitle"></span></p>
+        <div class="guide-grid" id="guideGrid"></div>
+        <p class="meta privacy"><i class="ti ti-lock" aria-hidden="true"></i><span data-i="privacy"></span></p>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div><p style="font-size:17px" data-i="footBrand"></p><p class="meta" data-i="footTag"></p></div>
+    <nav class="links" aria-label="Legal">
+      <a href="#" data-i="privacyLink"></a><a href="#" data-i="terms"></a><a href="#" data-i="contact"></a>
+    </nav>
+    <p class="mono copy">© <span id="year"></span> Travel Studio</p>
+  </div>
+</footer>
+
+<script>
+/* ========== 語系（介面文字；使用者內容不翻譯） ========== */
+const I18N={
+zh:{
+  protoLabel:"原型預覽（正式版移除）",protoNew:"首次訪客",protoBack:"回訪使用者",
+  sub:"手帳工作桌",nav1:"開始規劃",nav2:"我的行程",nav3:"協作說明",login:"Google 登入同步",
+  themeLabel:"切換配色",menuLabel:"選單",
+  dispatch:"出發單 No.",autosave:"自動儲存",h1:"開始規劃新旅程",lead:"免註冊，填目的地和日期就能開始。",
+  lDest:"［01 目的地 *］",lStart:"［02 出發日期 *］",lEnd:"［03 回程日期 *］",lName:"［04 行程名稱・選填］",
+  phDest:"泰國曼谷",phName:"未填會自動命名",seal:"印",cta:"建立行程，開始編輯",
+  errDest:"請填寫目的地",errNone:"請選擇出發與回程日期",errOrder:"回程日期不能早於出發日期",errMax:"單一行程最多 30 天",
+  checkDates:"請確認日期",
+  lineNote:"建立後可用 LINE 邀請朋友，免註冊一起編輯。",formFoot:"人數、幣別、預算可在編輯器設定。",
+  stampMid:"手帳工坊",stampBottom:y=>`★ ${y} 出發`,
+  guideTitle:"手帳工作桌使用備忘",privacy:"行程自動儲存；新行程預設私人，只有你邀請的人看得到。",
+  footBrand:"Travel Studio 手帳工作桌",footTag:"免登入建立 · LINE 邀請共編 · 匯出 PDF",
+  privacyLink:"隱私權政策",terms:"服務條款",contact:"聯絡我們",
+  fmt:d=>`${d.getMonth()+1}/${d.getDate()}（${"日一二三四五六"[d.getDay()]}）`,
+  fmtShort:d=>`${d.getMonth()+1}/${d.getDate()}`,
+  preview:(n,a,b)=>`將建立 ${n} 天：DAY 01 ${a} → DAY ${b}`,
+  autoName:(d,n)=>`${d} ${n} 日`,
+  ok:x=>`原型：已建立「${x}」，正式版會進入編輯器`,
+  durStub:d=>`${d} 天<br>${d-1} 夜`,
+  durTag:d=>`${d} 天 ${d-1} 夜`,
+  themes:["手帳紙色","牛皮燕麥","蜜桃暖杏","鼠尾草綠","南洋蔚藍"],
+  guide:[["① 免登入共同編輯","朋友從 LINE 開啟，輸入暱稱就能一起改。"],["② 時間衝突提示","時段重疊會提醒，不會自動改動固定行程。"],["③ 預算自動加總","分每人與整團，每日與全程自動計算。"],["④ 閱讀模式與 PDF","出發時用乾淨的閱讀版，也能列印。"]],
+  gLabel:"使用指南",gChip:"第一次使用",gTitle:"四步一起規劃旅行",gLead:"不用註冊，建立後就能用 LINE 邀朋友一起編輯。",
+  steps:[["建立行程","填目的地與日期，自動產生每天的 DAY。"],["加入景點","照片、時間、交通、預算與訂位，一張卡片整理好。"],["LINE 邀請","傳一條編輯連結，朋友輸入暱稱就能加入。"],["同步與分享","修改即時同步，可匯出 PDF 或只給觀看連結。"]],
+  rLabel:"進行中筆記 #01",rChip:"最近編輯",live:n=>`${n} 位好友 LINE 共編中`,me:"我",
+  edited:"2 小時前修改",progLabel:"已排景點天數",prog:(a,b)=>`${a} / ${b} 天`,
+  activity:(who,day,place)=>`${who} 在 DAY ${day} 新增了「${place}」`,
+  resume:"繼續編輯",copyInvite:"複製編輯邀請",
+  others:"我的其他行程",viewAll:"查看全部行程 →",
+  vis:{private:"私人",link:"連結分享",public:"公開"},
+  who:n=>n===1?"只有你":`${n} 人共編`,
+  planned:(a,b)=>`${a} / ${b} 天已排景點`
+},
+en:{
+  protoLabel:"Prototype preview (removed in production)",protoNew:"First visit",protoBack:"Returning",
+  sub:"MAKER'S CORKBOARD DESK",nav1:"Plan",nav2:"My trips",nav3:"How to collaborate",login:"Sign in with Google",
+  themeLabel:"Change colors",menuLabel:"Menu",
+  dispatch:"DISPATCH NO.",autosave:"Autosaved",h1:"Start a new trip",lead:"No sign-up. Add a destination and dates to begin.",
+  lDest:"[01 DESTINATION *]",lStart:"[02 START DATE *]",lEnd:"[03 END DATE *]",lName:"[04 TRIP NAME · OPTIONAL]",
+  phDest:"Bangkok, Thailand",phName:"Leave blank to auto-name",seal:"GO",cta:"Create trip and start editing",
+  errDest:"Enter a destination",errNone:"Choose a start and end date",errOrder:"End date can't be before start date",errMax:"Trips can be up to 30 days",
+  checkDates:"Check your dates",
+  lineNote:"After creating, invite friends on LINE to edit together. No sign-up needed.",formFoot:"Set travelers, currency, and budget in the editor.",
+  stampMid:"ARTISAN",stampBottom:y=>`★ ${y} DEPT`,
+  guideTitle:"PLATFORM HIGHLIGHTS",privacy:"Trips save automatically. New trips are private—only people you invite can see them.",
+  footBrand:"Travel Studio · Maker's Desk",footTag:"No sign-up · Co-edit via LINE · Export PDF",
+  privacyLink:"Privacy",terms:"Terms",contact:"Contact",
+  fmt:d=>d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}),
+  fmtShort:d=>d.toLocaleDateString('en-US',{month:'short',day:'numeric'}),
+  preview:(n,a,b)=>`${n} days: DAY 01 ${a} → DAY ${b}`,
+  autoName:(d,n)=>`${d} · ${n} days`,
+  ok:x=>`Prototype: created “${x}”. The live site opens the editor.`,
+  durStub:d=>`${d}D${d-1}N`,
+  durTag:d=>`${d}D${d-1}N`,
+  themes:["Notebook paper","Kraft oat","Peach apricot","Sage green","Tropical blue"],
+  guide:[["① Co-edit without sign-up","Friends open the LINE link and start editing."],["② Time conflict alerts","Overlaps are flagged; fixed plans stay put."],["③ Budget totals","Per person or group, by day and for the whole trip."],["④ Reading mode and PDF","A clean view for the road, ready to print."]],
+  gLabel:"GUIDE",gChip:"FIRST TIME",gTitle:"Plan together in four steps",gLead:"No sign-up. Invite friends on LINE once your trip is created.",
+  steps:[["Create a trip","Add a destination and dates; your days are set up for you."],["Add stops","Photos, times, transport, budget, and bookings on one card."],["Invite on LINE","Share an edit link; friends join with a nickname."],["Sync and share","Changes sync live. Export a PDF or share view-only."]],
+  rLabel:"ONGOING NOTE #01",rChip:"RECENT",live:n=>`${n} friends editing via LINE`,me:"Me",
+  edited:"Edited 2 hours ago",progLabel:"Days with stops",prog:(a,b)=>`${a} of ${b}`,
+  activity:(who,day,place)=>`${who} added “${place}” to DAY ${day}`,
+  resume:"Resume editing",copyInvite:"Copy edit invite",
+  others:"MY OTHER JOURNEYS",viewAll:"View all trips →",
+  vis:{private:"Private",link:"Link sharing",public:"Public"},
+  who:n=>n===1?"Just you":`${n} editors`,
+  planned:(a,b)=>`${a} of ${b} days planned`
+}};
+
+/* ========== 示範資料（正式版改接後端） ========== */
+const today=new Date();
+const addDays=(d,n)=>{const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()+n);return x};
+const RECENT={title:"曼谷 5 日 4 夜悠閒吃喝團",start:addDays(today,14),days:5,planned:3,collab:4,activity:{who:"Amy",day:3,place:"恰圖恰市集"}};
+const OTHERS=[
+  {dest:"東京",title:"東京下町散步",start:addDays(today,40),days:6,planned:1,collab:1,vis:"private",photo:null,tack:"#A33A2A",washi:"#8EA98F",wl:"62%",r:"-1.2deg"},
+  {dest:"首爾",title:"首爾咖啡與選品",start:addDays(today,62),days:4,planned:4,collab:2,vis:"public",photo:null,tack:"#C9A86A",washi:"#DF8B7E",wl:"18%",r:".9deg"}
+];
+const THEMES=[["paper","#F8F4E9","#B86B45"],["kraft","#E8DDC5","#A5794C"],["peach","#FFF0E8","#DF8B7E"],["sage","#EAF0E7","#8EA98F"],["ocean","#E6F1F7","#7DAFCE"]];
+
+/* ========== 狀態 ========== */
+const store={get(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const browserLang=(navigator.language||'zh').toLowerCase().startsWith('zh')?'zh':'en';
+let lang=store.get('ts-lang',browserLang);
+let theme=store.get('ts-theme','paper');
+let returning=false;
+const $=id=>document.getElementById(id);
+const t=k=>I18N[lang][k];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse=v=>{if(!v)return null;const[y,m,d]=v.split('-').map(Number);return new Date(y,m-1,d)};
+
+/* ========== 下拉面板 ========== */
+function closePanels(){
+  document.querySelectorAll('.panel.open').forEach(p=>p.classList.remove('open'));
+  document.querySelectorAll('[aria-expanded=true]').forEach(b=>b.setAttribute('aria-expanded','false'));
+}
+function setupPanel(btn,panel){
+  btn.addEventListener('click',e=>{
+    e.stopPropagation();
+    const open=!panel.classList.contains('open');
+    closePanels();
+    panel.classList.toggle('open',open);
+    btn.setAttribute('aria-expanded',open);
+  });
+}
+document.addEventListener('click',e=>{if(!e.target.closest('.panel'))closePanels()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanels()});
+setupPanel($('themeBtn'),$('themePanel'));
+setupPanel($('menuBtn'),$('menuPanel'));
+
+/* ========== 配色 ========== */
+function renderThemes(){
+  $('themePanel').innerHTML=THEMES.map((th,i)=>`<button role="menuitemradio" aria-checked="${th[0]===theme}" data-k="${th[0]}"><span class="swatch" style="background:${th[1]};border-color:${th[2]}"></span>${t('themes')[i]}</button>`).join('');
+  $('themePanel').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    theme=b.dataset.k;store.set('ts-theme',theme);document.body.dataset.theme=theme;renderThemes();closePanels();
+  }));
+}
+
+/* ========== 表單 ========== */
+const startEl=$('startDate'),endEl=$('endDate'),destEl=$('dest'),nameEl=$('tripName');
+startEl.value=iso(addDays(today,14));endEl.value=iso(addDays(today,18));
+startEl.min=iso(today);endEl.min=startEl.value;
+function range(){const s=parse(startEl.value),e=parse(endEl.value);if(!s||!e)return null;return{s,e,n:Math.round((e-s)/864e5)+1}}
+function updatePreview(){
+  const r=range(),d=destEl.value.trim();
+  $('preview').textContent=(r&&r.n>=1&&r.n<=30)?t('preview')(r.n,t('fmt')(r.s),`${pad(r.n)} ${t('fmt')(r.e)}`):t('checkDates');
+  nameEl.placeholder=(d&&r&&r.n>=1)?t('autoName')(d,r.n):t('phName');
+}
+function clearDateErr(){$('errDate').classList.remove('show');endEl.removeAttribute('aria-invalid')}
+destEl.addEventListener('input',()=>{$('errDest').classList.remove('show');destEl.removeAttribute('aria-invalid');updatePreview()});
+startEl.addEventListener('input',()=>{
+  clearDateErr();
+  const s=parse(startEl.value),e=parse(endEl.value);
+  if(s&&e&&e<s)endEl.value=iso(addDays(s,4));
+  endEl.min=startEl.value||iso(today);
+  updatePreview();
+});
+endEl.addEventListener('input',()=>{clearDateErr();updatePreview()});
+$('tripForm').addEventListener('submit',e=>{
+  e.preventDefault();let bad=false;const r=range();
+  if(!destEl.value.trim()){$('errDest').classList.add('show');destEl.setAttribute('aria-invalid','true');bad=true}
+  const msg=!r?t('errNone'):r.n<1?t('errOrder'):r.n>30?t('errMax'):'';
+  if(msg){$('errDate').textContent=msg;$('errDate').classList.add('show');endEl.setAttribute('aria-invalid','true');bad=true}
+  if(bad){$('okMsg').classList.remove('show');(destEl.getAttribute('aria-invalid')?destEl:endEl).focus();return}
+  $('okMsg').textContent=t('ok')(nameEl.value.trim()||nameEl.placeholder);$('okMsg').classList.add('show');
+});
+
+/* ========== 軟木板內容 ========== */
+const STEP_ICONS=["ti-map-pin","ti-photo","ti-brand-line","ti-refresh"];
+function boardFirstVisit(){
+  return `<article class="note">
+    <div class="note-tab" aria-hidden="true"></div><span class="note-label">${t('gLabel')}</span>
+    <span class="chip">${t('gChip')}</span>
+    <h2 id="boardTitle">${t('gTitle')}</h2>
+    <p class="meta" style="font-size:14px">${t('gLead')}</p>
+    <div class="steps">${t('steps').map((s,i)=>`<div class="step"><p class="mono">0${i+1}</p><h3><i class="ti ${STEP_ICONS[i]}" aria-hidden="true"></i>${s[0]}</h3><p class="meta">${s[1]}</p></div>`).join('')}</div>
+  </article>`;
+}
+function postcard(x){
+  const end=addDays(x.start,x.days-1);
+  const icon={private:'ti-lock',link:'ti-link',public:'ti-world'}[x.vis];
+  const cover=x.photo
+    ? `<div class="cover-photo" style="background-image:url('${esc(x.photo)}')"><span class="dur">${t('durTag')(x.days)}</span></div>`
+    : `<div class="cover"><div class="main-part"><p class="dest">${esc(x.dest)}</p></div><div class="stub"><i class="ti ti-ticket" aria-hidden="true" style="font-size:20px"></i>${t('durStub')(x.days)}</div></div>`;
+  return `<article class="pc" style="--r:${x.r}">
+    <i class="tack" style="background:${x.tack}"></i><i class="washi" style="left:${x.wl};background:${x.washi}"></i>
+    ${cover}
+    <div class="pc-row"><h3>${esc(x.title)}</h3><span class="vis"><i class="ti ${icon}" aria-hidden="true"></i>${t('vis')[x.vis]}</span></div>
+    <p class="meta">${t('fmtShort')(x.start)} – ${t('fmtShort')(end)} · ${t('who')(x.collab)}</p>
+    <div class="pc-foot"><span class="meta">${t('planned')(x.planned,x.days)}</span><a href="#" class="btn-dark">${t('resume')}</a></div>
+  </article>`;
+}
+function boardReturning(){
+  const r=RECENT,end=addDays(r.start,r.days-1),pct=Math.round(r.planned/r.days*100);
+  return `<article class="note">
+    <div class="note-tab" aria-hidden="true"></div><span class="note-label">${t('rLabel')}</span>
+    <div class="note-head"><span class="chip">${t('rChip')}</span><span class="live"><i></i>${t('live')(r.collab)}</span></div>
+    <div class="resume">
+      <div>
+        <h2 id="boardTitle">${esc(r.title)}</h2>
+        <p class="meta" style="font-size:14px">${t('fmt')(r.start)} – ${t('fmt')(end)} · ${t('edited')}</p>
+        <div class="progress">
+          <div class="progress-row meta"><span style="color:var(--ink)">${t('progLabel')}</span><span>${t('prog')(r.planned,r.days)}</span></div>
+          <div class="track" role="progressbar" aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100" aria-label="${t('progLabel')}"><div class="fill" style="width:${pct}%"></div></div>
+        </div>
+        <div class="avatars"><span style="background:#302A25">${t('me')}</span><span style="background:#B86B45">K</span><span style="background:#5E7A62">A</span><span style="background:#8A7A6A">+1</span><p class="meta">${t('activity')(esc(r.activity.who),r.activity.day,esc(r.activity.place))}</p></div>
+      </div>
+      <div class="actions">
+        <a href="#" class="btn-dark"><i class="ti ti-player-play" aria-hidden="true"></i>${t('resume')}</a>
+        <button class="btn-light" type="button"><i class="ti ti-copy" aria-hidden="true"></i>${t('copyInvite')}</button>
+      </div>
+    </div>
+  </article>
+  <div class="sec"><b aria-hidden="true"></b><h2 class="${lang==='en'?'mono-title':''}">${t('others')}</h2><a href="#">${t('viewAll')}</a></div>
+  <div class="cards">${OTHERS.map(postcard).join('')}</div>`;
+}
+
+/* ========== 全頁渲染 ========== */
+function render(){
+  document.documentElement.lang=lang==='zh'?'zh-Hant':'en';
+  document.body.dataset.theme=theme;
+  document.body.classList.toggle('returning',returning);
+  document.querySelectorAll('[data-i]').forEach(el=>{const v=t(el.dataset.i);if(typeof v==='string')el.textContent=v});
+  $('dispatch').textContent=`${t('dispatch')} ${today.getFullYear()}-001`;
+  $('stampBottom').textContent=t('stampBottom')(today.getFullYear());
+  destEl.placeholder=t('phDest');
+  $('themeBtn').setAttribute('aria-label',t('themeLabel'));
+  $('menuBtn').setAttribute('aria-label',t('menuLabel'));
+  $('langZh').setAttribute('aria-pressed',lang==='zh');$('langEn').setAttribute('aria-pressed',lang==='en');
+  $('stNew').setAttribute('aria-pressed',!returning);$('stBack').setAttribute('aria-pressed',returning);
+  $('guideGrid').innerHTML=t('guide').map(g=>`<div><h3>${g[0]}</h3><p class="meta">${g[1]}</p></div>`).join('');
+  $('boardContent').innerHTML=returning?boardReturning():boardFirstVisit();
+  $('year').textContent=today.getFullYear();
+  $('errDate').classList.remove('show');$('okMsg').classList.remove('show');
+  renderThemes();updatePreview();
+}
+function setLang(l){lang=l;store.set('ts-lang',l);render()}
+$('langZh').addEventListener('click',()=>setLang('zh'));
+$('langEn').addEventListener('click',()=>setLang('en'));
+$('stNew').addEventListener('click',()=>{returning=false;render()});
+$('stBack').addEventListener('click',()=>{returning=true;render()});
+render();
+</script>
+</body>
+</html>
+```
