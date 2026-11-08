@@ -19,7 +19,7 @@ const L = {
     emailLabel: 'Email', emailPh: 'you@example.com', send: '寄驗證碼', back: '選其他方式',
     codeSent: e => `驗證碼已寄到 ${e}，10 分鐘內有效。找不到的話看一下垃圾郵件。`, codeLabel: '驗證碼', verify: '登入', verifyLink: '綁定',
     resend: '重新寄送', resendIn: s => `${s} 秒後可重寄`, changeEmail: '改用其他 Email',
-    foot: '繼續即表示你同意', terms: '服務條款', privacy: '隱私權政策', and: '與',
+    foot: '繼續即表示你同意', terms: '服務條款', privacy: '隱私權政策', and: '與', termsUrl: 'terms.html', privacyUrl: 'privacy.html',
     errBadEmail: 'Email 格式不正確。', errBadCode: '驗證碼不正確或已過期，請重新輸入或重寄。', errTooMany: '太多次了，請稍等一分鐘再試。',
     errEmailTaken: '這個 Email 已經有帳號。請先登出匿名身分再用這個 Email 登入（匿名期間的編輯會留在原行程）。',
     errIdentityTaken: '這個帳號已經綁定在另一個使用者身上，請直接用它登入。', errCaptcha: '請先完成下方的驗證。',
@@ -35,7 +35,7 @@ const L = {
     emailLabel: 'Email', emailPh: 'you@example.com', send: 'Send code', back: 'Other options',
     codeSent: e => `We sent a code to ${e}. It expires in 10 minutes. Check your spam folder if you don't see it.`, codeLabel: 'Code', verify: 'Sign in', verifyLink: 'Link',
     resend: 'Resend', resendIn: s => `Resend in ${s}s`, changeEmail: 'Use a different email',
-    foot: 'By continuing you agree to the', terms: 'Terms', privacy: 'Privacy Policy', and: 'and',
+    foot: 'By continuing you agree to the', terms: 'Terms', privacy: 'Privacy Policy', and: 'and', termsUrl: 'terms-en.html', privacyUrl: 'privacy-en.html',
     errBadEmail: "That email doesn't look right.", errBadCode: "That code is wrong or expired. Try again or resend.", errTooMany: 'Too many tries. Wait a minute and try again.',
     errEmailTaken: 'That email already has an account. Sign out of guest mode, then sign in with it (your guest edits stay on the trip).',
     errIdentityTaken: "That account is already linked to someone else. Sign in with it directly.", errCaptcha: 'Please complete the verification below.',
@@ -152,7 +152,7 @@ function view() {
       <button type="button" class="auth-x" data-auth="close" aria-label="${x.close}">${ic('ti-x')}</button></div>
     <p class="auth-sub">${o.link ? x.subLink : x.subIn}</p>
     ${body}<p class="auth-err" role="alert" hidden></p>
-    <p class="auth-foot">${x.foot} <a href="terms.html" target="_blank" rel="noopener">${x.terms}</a> ${x.and} <a href="privacy.html" target="_blank" rel="noopener">${x.privacy}</a></p>`;
+    <p class="auth-foot">${x.foot} <a href="${x.termsUrl}" target="_blank" rel="noopener">${x.terms}</a> ${x.and} <a href="${x.privacyUrl}" target="_blank" rel="noopener">${x.privacy}</a></p>`;
   if (step === 'email') { mountCaptcha(); dlg.querySelector('#authEmail').focus(); }
   if (step === 'phone') { mountCaptcha(); dlg.querySelector('#authPhone').focus(); }
   if (step === 'code' || step === 'pcode') dlg.querySelector('#authCode').focus();
