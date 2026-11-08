@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Studio · 行程編輯器</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600&family=Noto+Sans+TC:wght@400;500&family=Courier+Prime&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+/* ========== 配色 token ========== */
+:root{
+  --paper:#F8F4E9;--ink:#302A25;--accent:#B86B45;--card:#FFFDF8;
+  --board:#EFE6D3;--frame:#CDBB98;--line:rgba(48,42,37,.2);--soft:rgba(48,42,37,.74);
+  --memo:#FBF3D5;--memo-line:#D9B86A;--danger:#A32D2D;
+  --conf:#C9733B;--conf-bg:#FBEFE5;--conf-line:#E0B08A;--conf-text:#8A4A1A;
+  --ok:#2E7A45;--ok-line:#5AA66F;--ok-bg:#F0F8F2;
+  --serif:"Noto Serif TC",Georgia,serif;
+  --sans:"Noto Sans TC",system-ui,-apple-system,sans-serif;
+  --mono:"Courier Prime","Noto Sans TC",ui-monospace,monospace;
+  --hand:"Caveat",cursive;
+}
+body[data-theme=kraft]{--paper:#E8DDC5;--ink:#594431;--accent:#A5794C;--card:#F6EFE0;--board:#DDCFB2;--frame:#B89E78;--line:rgba(89,68,49,.22);--soft:rgba(89,68,49,.8)}
+body[data-theme=peach]{--paper:#FFF0E8;--ink:#6F4C40;--accent:#DF8B7E;--card:#FFFAF6;--board:#F7E2D6;--frame:#E3B9A6;--line:rgba(111,76,64,.2);--soft:rgba(111,76,64,.82)}
+body[data-theme=sage]{--paper:#EAF0E7;--ink:#344B3B;--accent:#8EA98F;--card:#F8FBF6;--board:#DCE6D8;--frame:#A9BEA8;--line:rgba(52,75,59,.2);--soft:rgba(52,75,59,.82)}
+body[data-theme=ocean]{--paper:#E6F1F7;--ink:#2E4B61;--accent:#7DAFCE;--card:#F7FBFD;--board:#D6E7F0;--frame:#9EC0D6;--line:rgba(46,75,97,.2);--soft:rgba(46,75,97,.82)}
+
+/* ========== 基礎 ========== */
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--serif);background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:22px 22px}
+p,h1,h2,h3{margin:0}
+button{font-family:var(--sans);cursor:pointer;color:inherit;background:none;border:none;padding:0}
+a{color:inherit;text-decoration:none}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.meta{font:12px/1.6 var(--sans);color:var(--soft)}
+.mono{font:12px var(--mono);letter-spacing:.08em;color:var(--soft)}
+.app{display:grid;grid-template-columns:56px minmax(0,1fr);min-height:100vh}
+
+/* 左側工具欄 */
+.rail{background:var(--card);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;gap:10px;padding:12px 0;position:sticky;top:0;height:100vh}
+.rail button{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;color:var(--soft);font-size:18px}
+.rail button:hover{background:var(--board)}
+.rail button[aria-current=page]{background:var(--ink);color:var(--paper)}
+.rail .lg{background:var(--ink);color:var(--paper);font:500 12px var(--sans);width:34px;height:34px;margin-bottom:8px}
+.rail .spacer{flex:1}
+
+/* 頂部工具列 */
+.chip{font:12px var(--sans);border:1px solid var(--line);background:var(--card);height:30px;padding:0 10px;display:inline-flex;gap:5px;align-items:center;white-space:nowrap}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.top{background:var(--paper);border-bottom:1px solid var(--line);padding:10px 24px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;position:sticky;top:0;z-index:10}
+.top h1{font-size:17px;font-weight:600;margin-right:6px}
+.sync{font:12px var(--sans);color:#3B5A40;background:#EEF3EC;border:1px solid #8EA98F;padding:0 10px;height:30px;display:inline-flex;gap:6px;align-items:center}
+.sync i{width:7px;height:7px;background:#3B8A4E;display:inline-block}
+.av{display:flex;align-items:center;margin:0 4px}
+.av span{width:24px;height:24px;font:10px var(--sans);display:inline-flex;align-items:center;justify-content:center;color:#fff;margin-right:-6px;border:2px solid var(--paper)}
+.grow{margin-left:auto}
+
+/* DAY 分頁 */
+.days{background:var(--board);border-bottom:1px solid var(--frame);padding:0 24px;display:flex;align-items:flex-end;gap:4px;overflow-x:auto}
+.day{font:12px var(--sans);padding:10px 14px 8px;border:1px solid transparent;border-bottom:none;color:var(--soft);display:flex;flex-direction:column;align-items:center;gap:2px;min-width:112px;white-space:nowrap}
+.day b{font:600 13px var(--serif);color:var(--ink)}
+.day:hover{background:rgba(255,253,248,.5)}
+.day[aria-selected=true]{background:var(--paper);border-color:var(--frame);color:var(--ink);margin-bottom:-1px}
+.day.add{min-width:auto;flex-direction:row;gap:4px;align-self:center;padding:8px 12px}
+.days .page{margin-left:auto;padding-bottom:10px;white-space:nowrap}
+
+/* 主版面 */
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:28px;padding:26px 24px 44px;align-items:start}
+.bd{background:var(--ink);color:var(--paper);box-shadow:3px 3px 0 var(--accent);height:34px;padding:0 12px;font:13px var(--sans);display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+.bd:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--accent)}
+.bl{background:var(--card);border:1px solid var(--soft);height:34px;padding:0 10px;font:13px var(--sans);display:inline-flex;gap:6px;align-items:center;white-space:nowrap}
+.bl:hover{border-color:var(--ink)}
+.dh{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+.dh .k{display:inline-block;background:var(--accent);color:#fff;font:11px var(--mono);letter-spacing:.08em;padding:2px 8px;margin-bottom:6px}
+.dh h2{font-size:26px;font-weight:600;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.dh h2 .hand{font:600 24px var(--hand);color:var(--accent)}
+.dh .acts{display:flex;gap:8px;flex-wrap:wrap}
+
+/* 明信片 */
+.pc{background:var(--card);border:1px solid var(--line);box-shadow:0 1px 0 var(--line),0 10px 24px -14px rgba(48,42,37,.45);position:relative;margin-bottom:26px;transform:rotate(-.3deg)}
+.pc:nth-of-type(even){transform:rotate(.3deg)}
+.pc.conf{border:1.5px solid var(--conf)}
+.tape{position:absolute;top:-10px;left:50%;margin-left:-40px;width:80px;height:20px;opacity:.5;transform:rotate(-1.5deg);z-index:2}
+.pin{position:absolute;top:10px;left:12px;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#E6C56B,#9A7020);box-shadow:1px 2px 2px rgba(0,0,0,.3)}
+.head{display:flex;align-items:center;gap:10px;padding:12px 14px 10px 38px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.grip{color:var(--soft);font-size:16px;cursor:grab}
+.lbl{font:12px var(--sans);background:var(--board);border-left:3px solid var(--accent);padding:3px 10px}
+.st{font:12px var(--sans);border:1.5px dashed;padding:2px 10px;display:inline-flex;gap:5px;align-items:center}
+.st.ok{color:var(--ok);border-color:var(--ok-line);background:var(--ok-bg)}
+.st.todo{color:var(--conf-text);border-color:var(--conf-line);background:var(--conf-bg)}
+.st.warn{color:var(--danger);border-color:var(--danger);background:#FBEFEF}
+.time{margin-left:auto;font:13px var(--sans);border:1px solid var(--line);background:var(--paper);padding:4px 12px;display:inline-flex;gap:8px;align-items:center}
+.time b{font-weight:500}
+.lock{color:var(--accent);font-size:11px}
+.body{display:grid;grid-template-columns:280px minmax(0,1fr);gap:22px;padding:18px 18px 14px}
+.pola{background:#fff;padding:12px 12px 44px;box-shadow:0 2px 8px rgba(0,0,0,.18);transform:rotate(-2deg);position:relative;align-self:start}
+.pola .img{aspect-ratio:4/3;border-radius:3px;background-size:cover;background-position:center}
+.p1{background:linear-gradient(160deg,#C9B8A2,#8A6A4A 60%,#4A3A2E)}
+.p2{background:linear-gradient(160deg,#7A6A5A,#3A2E28 70%)}
+.p3{background:linear-gradient(160deg,#D8C9A8,#B89E6A 50%,#6A5A3A)}
+.p4{background:linear-gradient(170deg,#2E3F55,#1A2538 60%,#B86B45)}
+.pola .hand{position:absolute;left:14px;bottom:8px;font:600 24px/1 var(--hand);color:var(--ink)}
+.pola .cam{position:absolute;top:18px;right:18px;background:rgba(0,0,0,.45);color:#fff;font:11px var(--sans);padding:3px 8px;display:inline-flex;gap:4px;align-items:center}
+.rs{width:60px;height:60px;border-radius:50%;border:2px solid currentColor;display:inline-flex;align-items:center;justify-content:center;position:relative;flex:none;background:rgba(255,253,248,.85)}
+.rs::before{content:"";position:absolute;inset:3px;border:1px dashed currentColor;border-radius:50%}
+.rs span{display:flex;flex-direction:column;align-items:center;font:500 10px/1.2 var(--sans);text-align:center}
+.rs small{font:9px var(--mono)}
+.pola .rs{position:absolute;right:-14px;bottom:-10px;transform:rotate(-12deg)}
+.info h3{font-size:19px;font-weight:600;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.info h3 .meta{margin-left:auto;font-size:11px}
+.desc{font:13px/1.7 var(--sans);color:var(--soft);margin-top:6px}
+.cost{margin-top:12px;background:var(--paper);border:1px solid var(--line);padding:10px 12px;font:12px var(--sans)}
+.cost .r{display:flex;justify-content:space-between;padding:2px 0}
+.cost .r+.r{border-top:1px dashed var(--line);margin-top:4px;padding-top:6px;color:var(--soft)}
+.cost b{font-weight:500}
+.cost .acc{color:var(--accent);font:600 14px var(--sans)}
+.btns{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.lk{font:12px var(--sans);border:1px solid var(--soft);background:var(--card);padding:6px 12px;display:inline-flex;gap:5px;align-items:center;box-shadow:2px 2px 0 var(--line)}
+.lk:hover{border-color:var(--ink)}
+.lk.dk{background:var(--ink);color:var(--paper);border-color:var(--ink);box-shadow:2px 2px 0 var(--accent)}
+.stamps{display:flex;gap:8px;align-items:center;margin-top:14px}
+.stamps .rs{width:50px;height:50px}
+.addstamp{width:50px;height:50px;border-radius:50%;border:1.5px dashed var(--soft);display:inline-flex;align-items:center;justify-content:center;color:var(--soft);font-size:16px}
+.addstamp:hover{border-style:solid;color:var(--ink)}
+.memo{margin:0 18px 12px;background:var(--memo);border:1px solid var(--memo-line);border-left:4px solid var(--memo-line);padding:10px 14px;font:12px/1.7 var(--sans)}
+.memo b{font-weight:500}
+.memo mark{background:#F7E28A;padding:0 3px}
+.memo .sub{color:var(--soft);display:block}
+.conf-box{margin:0 18px 12px;background:var(--conf-bg);border:1px solid var(--conf-line);border-left:4px solid var(--conf);padding:10px 14px;font:12px/1.6 var(--sans);color:var(--conf-text)}
+.conf-box .acts{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.conf-box .acts button{border:1px solid var(--conf);background:#fff;padding:4px 10px;color:var(--ink);font-size:12px}
+.foot{border-top:1px solid var(--line);padding:8px 14px;display:flex;align-items:center;gap:14px;font:12px var(--sans);color:var(--soft);flex-wrap:wrap}
+.foot .who{font:600 15px var(--hand);color:#8A7A6A;display:inline-flex;gap:6px;align-items:center}
+.foot .who i{width:8px;height:8px;border-radius:50%;background:#3B8A4E;display:inline-block}
+.foot .ops{margin-left:auto;display:flex;gap:14px;flex-wrap:wrap}
+.foot .ops button{display:inline-flex;gap:4px;align-items:center;font-size:12px;color:var(--soft)}
+.foot .ops button:hover{color:var(--ink)}
+.foot .del{color:var(--danger)!important}
+
+/* 票根 */
+.tk{margin:-6px auto 22px;max-width:560px;border:1.5px dashed var(--soft);background:var(--card);padding:12px 24px;display:flex;align-items:center;gap:14px;position:relative;font:12px var(--sans)}
+.tk::before,.tk::after{content:"";position:absolute;width:16px;height:16px;background:var(--paper);border:1.5px dashed var(--soft);border-radius:50%;top:50%;margin-top:-8px}
+.tk::before{left:-9px}.tk::after{right:-9px}
+.tk .ic{font-size:22px}
+.tk .tx{flex:1;min-width:0}
+.tk b{font-weight:500}
+.tk .hand{font:600 15px var(--hand);color:var(--soft)}
+.tk .dur{background:var(--conf-bg);border:1px solid var(--conf-line);padding:3px 8px;color:var(--conf-text);white-space:nowrap}
+.tk .rs{width:52px;height:52px}
+.tk.warn{border-color:var(--danger)}
+.tk.warn .dur{background:#FBEFEF;border-color:var(--danger);color:var(--danger)}
+.tk .edit{color:var(--soft);font-size:16px}
+.addcard{border:1.5px dashed var(--soft);padding:22px;text-align:center;font:13px var(--sans);color:var(--soft);background:rgba(255,253,248,.5);width:100%}
+.addcard:hover{border-style:solid;color:var(--ink)}
+
+/* 右欄 */
+aside{position:sticky;top:62px}
+.note{background:var(--card);border:1px solid var(--line);box-shadow:0 1px 0 var(--line),0 8px 20px -14px rgba(48,42,37,.4);margin-bottom:22px}
+.nh{display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--line);background:linear-gradient(var(--card),var(--paper))}
+.nh h3{font-size:15px;font-weight:600;display:flex;gap:6px;align-items:center}
+.nh .cnt{margin-left:auto;font:11px var(--sans);border:1px solid var(--line);background:var(--card);padding:2px 8px;border-radius:10px;white-space:nowrap}
+.nh .cnt.ok{border:1.5px dashed var(--ok-line);color:var(--ok);background:var(--ok-bg)}
+.nb{padding:14px 16px}
+.tl{position:relative;padding-left:22px}
+.tl::before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:var(--line)}
+.ti{position:relative;padding-bottom:16px;font:13px var(--sans)}
+.ti::before{content:"";position:absolute;left:-21px;top:3px;width:11px;height:11px;border-radius:50%;background:var(--card);border:2px solid #7DAFCE}
+.ti.fixed::before{border-color:var(--accent);background:var(--accent)}
+.ti.cf::before{border-color:#C9A86A;background:#E6C56B}
+.ti .r{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.ti .t{font-weight:500}
+.ti .d{font-size:11px;color:var(--soft)}
+.ti .n{font-size:14px;font-weight:600;font-family:var(--serif);margin-top:2px}
+.ti .s{font-size:12px;color:var(--soft)}
+.tr{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:8px 10px;margin:8px 0 14px;font:12px var(--sans)}
+.tr .r{display:flex;justify-content:space-between}
+.tr .m{color:var(--accent);font-weight:500}
+.tr .s{color:var(--soft);margin-top:2px}
+.tr.warn{border-color:var(--conf-line);background:var(--conf-bg);color:var(--conf-text)}
+.ti.cf .box{background:var(--memo);border:1px solid var(--memo-line);border-radius:4px;padding:8px 10px}
+.ti.cf .tip{font-size:12px;color:var(--conf-text);margin-top:4px}
+.ti.cf .acts{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.ti.cf .acts button{border:1px solid var(--conf);background:#fff;padding:3px 8px;font-size:11px}
+.big{background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:12px 14px;font:13px var(--sans)}
+.big .r{display:flex;justify-content:space-between;align-items:baseline;padding:3px 0}
+.big .v{font:600 24px var(--serif)}
+.big .acc{color:var(--accent);font:500 15px var(--sans)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.two div{border:1px solid var(--line);border-radius:4px;padding:10px 12px;font:11px var(--sans);color:var(--soft)}
+.two b{display:block;font:600 16px var(--serif);color:var(--ink);margin:2px 0}
+.two i{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:4px}
+.bar-r{display:flex;justify-content:space-between;font:12px var(--sans);color:var(--soft);margin-top:14px}
+.bar{height:8px;background:var(--line);border-radius:4px;margin:6px 0}
+.bar div{height:8px;background:linear-gradient(90deg,#8EA98F,#5E7A62);border-radius:4px}
+.bar-f{display:flex;justify-content:space-between;font:12px var(--sans)}
+.bar-f .g{color:var(--ok)}
+.seg{display:flex;border:1px solid var(--line);font:12px var(--sans);margin-bottom:12px}
+.seg button{flex:1;text-align:center;padding:5px;color:var(--soft);font-size:12px}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--paper)}
+.rm{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:4px;padding:10px 12px;margin-bottom:8px;font:13px var(--sans);background:var(--card)}
+.rm i.dot{width:8px;height:8px;border-radius:50%;flex:none}
+.rm .tag{margin-left:auto;font-size:11px;border:1px solid;padding:2px 8px;white-space:nowrap}
+.rm .tag.b{color:#2E4B61;border-color:#9EC0D6;background:#EEF5F9}
+.rm .tag.o{color:var(--conf-text);border-color:var(--conf-line);background:var(--conf-bg)}
+.soon{margin-top:10px;border:1px dashed var(--soft);padding:9px 12px;font:12px var(--sans);color:var(--soft);display:flex;gap:8px;align-items:center}
+.soon .pl{margin-left:auto;font-size:10px;border:1px solid var(--soft);padding:0 5px}
+.line{background:#EEF8EF;border:1px solid #9ACFA6;border-radius:6px;padding:12px 14px;display:flex;gap:12px;align-items:center}
+.line .lg{background:#06C755;color:#fff;font:600 11px var(--sans);padding:6px 8px;border-radius:4px}
+.line .tx{flex:1;font:12px var(--sans)}
+.line b{font-weight:500;display:flex;gap:6px;align-items:center}
+.line .on{font-size:10px;background:#06C755;color:#fff;padding:1px 6px;border-radius:8px}
+.line .s{color:var(--soft);margin-top:2px}
+.line .btn{background:#06C755;color:#fff;font:12px var(--sans);padding:7px 12px;border-radius:4px;white-space:nowrap}
+
+/* ========== 平板 ========== */
+@media (max-width:1180px){
+  .grid{grid-template-columns:minmax(0,1fr)}
+  aside{position:static}
+  .body{grid-template-columns:240px minmax(0,1fr)}
+}
+/* ========== 手機 ========== */
+@media (max-width:719px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .rail{display:none}
+  .top{padding:10px 14px}
+  .top h1{width:100%;font-size:16px}
+  .days{padding:0 14px}
+  .days .page{display:none}
+  .grid{padding:20px 14px 36px}
+  .dh h2{font-size:22px}
+  .head{padding-left:34px}
+  .time{margin-left:0;width:100%;justify-content:space-between}
+  .body{grid-template-columns:minmax(0,1fr);gap:26px;padding:16px 14px 12px}
+  .pola{transform:rotate(-1deg);max-width:300px}
+  .memo,.conf-box{margin:0 14px 12px}
+  .foot .ops{margin-left:0;width:100%}
+  .tk{margin:-4px 8px 20px;max-width:none;padding:10px 18px;flex-wrap:wrap}
+  .tk .rs{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  .pc,.pola{transform:none}
+}
+</style>
+</head>
+<body data-theme="paper">
+<div class="app">
+
+<nav class="rail" aria-label="主要導覽">
+  <button class="lg" aria-label="Travel Studio">TS</button>
+  <button aria-current="page" aria-label="行程編輯器"><i class="ti ti-notebook" aria-hidden="true"></i></button>
+  <button aria-label="我的行程"><i class="ti ti-folder" aria-hidden="true"></i></button>
+  <button aria-label="協作者"><i class="ti ti-users" aria-hidden="true"></i></button>
+  <button aria-label="版本紀錄"><i class="ti ti-history" aria-hidden="true"></i></button>
+  <span class="spacer"></span>
+  <button aria-label="配色" id="themeBtn"><i class="ti ti-palette" aria-hidden="true"></i></button>
+  <button aria-label="設定"><i class="ti ti-settings" aria-hidden="true"></i></button>
+</nav>
+
+<div>
+  <div class="top">
+    <h1>曼谷 5 日 4 夜悠閒吃喝團</h1>
+    <span class="mono">2026/11/22 – 11/26</span>
+    <span class="sync" role="status"><i></i>已儲存 · 4 人共編中</span>
+    <div class="av" aria-label="協作者"><span style="background:#302A25">我</span><span style="background:#B86B45">K</span><span style="background:#5E7A62">A</span><span style="background:#8A7A6A">+1</span></div>
+    <span class="grow"></span>
+    <span class="chip"><i class="ti ti-link" aria-hidden="true"></i>連結分享</span>
+    <button class="chip"><i class="ti ti-brand-line" style="color:#06A94D" aria-hidden="true"></i>複製編輯邀請</button>
+    <button class="chip"><i class="ti ti-share" aria-hidden="true"></i>分享設定</button>
+    <button class="chip"><i class="ti ti-history" aria-hidden="true"></i>版本</button>
+    <button class="chip"><i class="ti ti-palette" aria-hidden="true"></i>風格</button>
+    <button class="chip" aria-pressed="true"><i class="ti ti-eye" aria-hidden="true"></i>閱讀模式</button>
+  </div>
+
+  <div class="days" role="tablist" aria-label="行程天數">
+    <button class="day" role="tab" aria-selected="false"><b>DAY 01</b><span>11/22（日）· 2 站</span></button>
+    <button class="day" role="tab" aria-selected="false"><b>DAY 02</b><span>11/23（一）· 4 站</span></button>
+    <button class="day" role="tab" aria-selected="true"><b>DAY 03</b><span>11/24（二）· 4 站</span></button>
+    <button class="day" role="tab" aria-selected="false"><b>DAY 04</b><span>11/25（三）· 未排</span></button>
+    <button class="day" role="tab" aria-selected="false"><b>DAY 05</b><span>11/26（四）· 未排</span></button>
+    <button class="day add"><i class="ti ti-plus" aria-hidden="true"></i> 新增一天</button>
+    <span class="meta page"><i class="ti ti-pencil" aria-hidden="true"></i> 曼谷手帳 · 第 3 頁</span>
+  </div>
+
+  <div class="grid">
+    <main>
+      <div class="dh">
+        <div><span class="k">DAY 03</span><h2>11/24（二）· 曼谷老城與河畔 <span class="hand">foodie tour</span></h2><p class="meta">4 站 · 10:00 – 21:30 · 預估每人 THB 1,650 · 步行約 8,000 步</p></div>
+        <div class="acts"><button class="bl"><i class="ti ti-sticker" aria-hidden="true"></i>貼紙</button><button class="bl"><i class="ti ti-photo" aria-hidden="true"></i>相簿</button><button class="bl"><i class="ti ti-arrows-sort" aria-hidden="true"></i>排序</button><button class="bd"><i class="ti ti-plus" aria-hidden="true"></i>新增景點</button></div>
+      </div>
+
+      <!-- 卡 1 -->
+      <article class="pc"><i class="tape" style="background:#8EA98F" aria-hidden="true"></i><i class="pin" aria-hidden="true"></i>
+        <div class="head"><i class="ti ti-grip-vertical grip" aria-hidden="true"></i><span class="lbl"><i class="ti ti-building-store" aria-hidden="true"></i> 市集打卡</span><span class="st ok"><i class="ti ti-check" aria-hidden="true"></i>不需預約</span><span class="time"><i class="ti ti-clock" aria-hidden="true"></i><b>10:00 – 13:00</b><span class="meta">停留 3h</span></span></div>
+        <div class="body">
+          <div class="pola"><div class="img p1" role="img" aria-label="恰圖恰週末市集照片"></div><button class="cam"><i class="ti ti-camera" aria-hidden="true"></i>換照片</button><span class="hand">Chatuchak 週末市集</span><span class="rs" style="color:#B86B45"><span>必去<small>11/08</small></span></span></div>
+          <div class="info"><h3>恰圖恰週末市集<span class="meta">週六日 09:00 – 18:00</span></h3>
+            <p class="desc">週末限定，二手衣與香氛區在 Section 2–4，記得帶現金；市集內有室內冷氣區可休息。</p>
+            <div class="cost"><div class="r"><span><i class="ti ti-coins" aria-hidden="true"></i> 費用估算</span><b>約 THB 500 / 人</b></div><div class="r"><span>全團 4 人總計</span><span class="acc">THB 2,000</span></div></div>
+            <div class="btns"><a class="lk" href="#"><i class="ti ti-map-pin" aria-hidden="true"></i>地圖</a><a class="lk" href="#"><i class="ti ti-world" aria-hidden="true"></i>官網</a></div>
+            <div class="stamps"><span class="rs" style="color:#5E7A62"><span>不需<br>預約</span></span><button class="addstamp" aria-label="蓋章"><i class="ti ti-plus" aria-hidden="true"></i></button><span class="meta">蓋章</span></div>
+          </div>
+        </div>
+        <div class="memo"><b><i class="ti ti-pin" aria-hidden="true"></i> 【手帳備忘夾頁】</b>：Ken 說 <mark>11 點後</mark> 很熱，先逛室內區再去戶外；香氛區可以殺價。<span class="sub"><i class="ti ti-pencil" aria-hidden="true"></i> Amy：想找藤編包</span></div>
+        <div class="foot"><span class="who"><i></i>Amy 於 11/06 貼上手帳本</span><div class="ops"><button><i class="ti ti-pencil" aria-hidden="true"></i>編輯</button><button aria-label="上移"><i class="ti ti-arrow-up" aria-hidden="true"></i></button><button aria-label="下移"><i class="ti ti-arrow-down" aria-hidden="true"></i></button><button><i class="ti ti-calendar-event" aria-hidden="true"></i>移到其他天</button><button><i class="ti ti-copy" aria-hidden="true"></i>複製</button><button class="del"><i class="ti ti-trash" aria-hidden="true"></i>移除</button></div></div>
+      </article>
+
+      <div class="tk"><i class="ti ti-car ic" aria-hidden="true"></i><div class="tx"><b>Grab 叫車（恰圖恰 → 老城區）</b><br><span class="hand">約 25 分 · THB 150 / 車 · 避開 13:00 塞車</span></div><span class="dur">25 分鐘</span><span class="rs" style="color:#2E4B61"><span>交通<br>OK<small>11/06</small></span></span><button class="edit" aria-label="編輯交通"><i class="ti ti-pencil" aria-hidden="true"></i></button></div>
+
+      <!-- 卡 2 -->
+      <article class="pc"><i class="tape" style="background:#DF8B7E" aria-hidden="true"></i><i class="pin" aria-hidden="true"></i>
+        <div class="head"><i class="ti ti-grip-vertical grip" aria-hidden="true"></i><span class="lbl"><i class="ti ti-tools-kitchen-2" aria-hidden="true"></i> 美味打卡</span><span class="st ok"><i class="ti ti-check" aria-hidden="true"></i>已訂位 · 4 人入座</span><span class="time"><i class="ti ti-clock" aria-hidden="true"></i><b>13:30 – 15:00</b><span class="lock"><i class="ti ti-lock" aria-hidden="true"></i> 固定</span><span class="meta">停留 1h 30m</span></span></div>
+        <div class="body">
+          <div class="pola"><div class="img p2" role="img" aria-label="Jay Fai 照片"></div><button class="cam"><i class="ti ti-camera" aria-hidden="true"></i>換照片</button><span class="hand">Jay Fai 蟹肉歐姆蛋</span><span class="rs" style="color:#2E7A45"><span>已預約<small>11/24</small></span></span></div>
+          <div class="info"><h3>Jay Fai 蟹肉歐姆蛋<span class="meta">營業 14:00 – 23:00</span></h3>
+            <p class="desc">米其林一星街邊攤，招牌蟹肉歐姆蛋與乾炒金邊粉；遲到 15 分鐘取消訂位。</p>
+            <div class="cost"><div class="r"><span><i class="ti ti-coins" aria-hidden="true"></i> 費用估算</span><b>約 THB 1,000 / 人</b></div><div class="r"><span>全團 4 人總計</span><span class="acc">THB 4,000（已付訂）</span></div></div>
+            <div class="btns"><a class="lk" href="#"><i class="ti ti-map-pin" aria-hidden="true"></i>地圖</a><a class="lk" href="#"><i class="ti ti-world" aria-hidden="true"></i>菜單</a><a class="lk dk" href="#"><i class="ti ti-ticket" aria-hidden="true"></i>訂位連結 · JF-8821</a></div>
+            <div class="stamps"><span class="rs" style="color:#A33A2A"><span>已付款<small>11/01</small></span></span><button class="addstamp" aria-label="蓋章"><i class="ti ti-plus" aria-hidden="true"></i></button></div>
+          </div>
+        </div>
+        <div class="memo"><b><i class="ti ti-pin" aria-hidden="true"></i> 【手帳備忘夾頁】</b>：建議 <mark>13:15 前抵達</mark>，現場仍會排隊；已備註少辣。<span class="sub"><i class="ti ti-bell" aria-hidden="true"></i> 提醒 11/20 再確認訂位</span></div>
+        <div class="foot"><span class="who"><i></i>我 於 11/01 貼上手帳本</span><div class="ops"><button><i class="ti ti-pencil" aria-hidden="true"></i>編輯</button><button aria-label="上移"><i class="ti ti-arrow-up" aria-hidden="true"></i></button><button aria-label="下移"><i class="ti ti-arrow-down" aria-hidden="true"></i></button><button><i class="ti ti-calendar-event" aria-hidden="true"></i>移到其他天</button><button><i class="ti ti-copy" aria-hidden="true"></i>複製</button><button class="del"><i class="ti ti-trash" aria-hidden="true"></i>移除</button></div></div>
+      </article>
+
+      <div class="tk warn"><i class="ti ti-alert-triangle ic" style="color:var(--danger)" aria-hidden="true"></i><div class="tx"><b style="color:var(--danger)">尚未設定交通</b><br><span class="hand">Jay Fai 15:00 結束，下一站 15:00 開始</span></div><span class="dur">0 分鐘</span><button class="lk"><i class="ti ti-plus" aria-hidden="true"></i>補交通</button></div>
+
+      <!-- 卡 3（衝突） -->
+      <article class="pc conf"><i class="tape" style="background:#C9733B" aria-hidden="true"></i><i class="pin" aria-hidden="true"></i>
+        <div class="head"><i class="ti ti-grip-vertical grip" aria-hidden="true"></i><span class="lbl"><i class="ti ti-car" aria-hidden="true"></i> 活動體驗</span><span class="st warn"><i class="ti ti-alert-triangle" aria-hidden="true"></i>時間衝突</span><span class="st todo"><i class="ti ti-ticket" aria-hidden="true"></i>待訂</span><span class="time"><i class="ti ti-clock" aria-hidden="true"></i><b>15:00 – 16:30</b><span class="meta">停留 1h 30m</span></span></div>
+        <div class="conf-box" role="alert"><b>上一站 Jay Fai 為固定時間，15:00 結束；此站沒有交通時間，可能遲到。</b><div class="acts"><button>改為 15:30 開始</button><button>補交通時間</button><button>忽略這次</button></div></div>
+        <div class="body">
+          <div class="pola"><div class="img p3" role="img" aria-label="TOPKART 照片"></div><button class="cam"><i class="ti ti-camera" aria-hidden="true"></i>換照片</button><span class="hand">TOPKART 卡丁車太刺激了</span></div>
+          <div class="info"><h3>TOPKART Bangkok 室內卡丁車<span class="meta">營業 11:00 – 22:00</span></h3>
+            <p class="desc">室內冷氣賽道，需提前網路預約時段；官網寫 4 人成團。</p>
+            <div class="cost"><div class="r"><span><i class="ti ti-coins" aria-hidden="true"></i> 費用估算</span><b>約 THB 600 / 人</b></div><div class="r"><span>全團 4 人總計</span><span class="acc">THB 2,400</span></div></div>
+            <div class="btns"><a class="lk" href="#"><i class="ti ti-map-pin" aria-hidden="true"></i>地圖</a><a class="lk" href="#"><i class="ti ti-ticket" aria-hidden="true"></i>訂位連結</a><span class="lk"><i class="ti ti-bell" aria-hidden="true"></i>提醒 11/15</span></div>
+            <div class="stamps"><button class="addstamp" aria-label="蓋章"><i class="ti ti-plus" aria-hidden="true"></i></button><span class="meta">蓋章</span></div>
+          </div>
+        </div>
+        <div class="memo"><b><i class="ti ti-pin" aria-hidden="true"></i> 【手帳備忘夾頁】</b>：Ken 打電話確認最小人數中。</div>
+        <div class="foot"><span class="who"><i></i>Ken 於 11/07 貼上手帳本</span><div class="ops"><button><i class="ti ti-pencil" aria-hidden="true"></i>編輯</button><button aria-label="上移"><i class="ti ti-arrow-up" aria-hidden="true"></i></button><button aria-label="下移"><i class="ti ti-arrow-down" aria-hidden="true"></i></button><button><i class="ti ti-calendar-event" aria-hidden="true"></i>移到其他天</button><button><i class="ti ti-copy" aria-hidden="true"></i>複製</button><button class="del"><i class="ti ti-trash" aria-hidden="true"></i>移除</button></div></div>
+      </article>
+
+      <div class="tk"><i class="ti ti-ship ic" aria-hidden="true"></i><div class="tx"><b>ICONSIAM 接駁船（Sathorn 碼頭 → 河畔）</b><br><span class="hand">免費 · 約 15 分 · 每 10 分一班</span></div><span class="dur">15 分鐘</span><button class="addstamp" style="width:52px;height:52px" aria-label="蓋章"><i class="ti ti-plus" aria-hidden="true"></i></button><button class="edit" aria-label="編輯交通"><i class="ti ti-pencil" aria-hidden="true"></i></button></div>
+
+      <!-- 卡 4 -->
+      <article class="pc"><i class="tape" style="background:#7DAFCE" aria-hidden="true"></i><i class="pin" aria-hidden="true"></i>
+        <div class="head"><i class="ti ti-grip-vertical grip" aria-hidden="true"></i><span class="lbl"><i class="ti ti-moon" aria-hidden="true"></i> 河畔晚餐</span><span class="st todo"><i class="ti ti-ticket" aria-hidden="true"></i>待訂 · 建議提前 3 天</span><span class="time"><i class="ti ti-clock" aria-hidden="true"></i><b>19:00 – 21:30</b><span class="meta">停留 2h 30m</span></span></div>
+        <div class="body">
+          <div class="pola"><div class="img p4" role="img" aria-label="Nathong Terrace 照片"></div><button class="cam"><i class="ti ti-camera" aria-hidden="true"></i>換照片</button><span class="hand">Nathong 水上泰味夜景</span><span class="rs" style="color:#6B5B8A"><span>雨天<br>備案<small>11/05</small></span></span></div>
+          <div class="info"><h3>Nathong Terrace 河畔晚餐<span class="meta">營業 17:00 – 23:00</span></h3>
+            <p class="desc">泰式料理配昭披耶河夜景，靠河邊的位子要先訂；戶外區下雨會移到室內。</p>
+            <div class="cost"><div class="r"><span><i class="ti ti-coins" aria-hidden="true"></i> 費用估算</span><b>約 THB 550 / 人</b></div><div class="r"><span>全團 4 人總計</span><span class="acc">THB 2,200</span></div></div>
+            <div class="btns"><a class="lk" href="#"><i class="ti ti-map-pin" aria-hidden="true"></i>地圖</a><a class="lk" href="#"><i class="ti ti-ticket" aria-hidden="true"></i>訂位連結</a><span class="lk"><i class="ti ti-bell" aria-hidden="true"></i>提醒 11/18</span></div>
+            <div class="stamps"><button class="addstamp" aria-label="蓋章"><i class="ti ti-plus" aria-hidden="true"></i></button><span class="meta">蓋章</span></div>
+          </div>
+        </div>
+        <div class="memo"><b><i class="ti ti-pin" aria-hidden="true"></i> 【手帳備忘夾頁】</b>：Amy 負責訂位；想坐 <mark>靠河第一排</mark>。</div>
+        <div class="foot"><span class="who"><i></i>Amy 於 11/05 貼上手帳本</span><div class="ops"><button><i class="ti ti-pencil" aria-hidden="true"></i>編輯</button><button aria-label="上移"><i class="ti ti-arrow-up" aria-hidden="true"></i></button><button aria-label="下移"><i class="ti ti-arrow-down" aria-hidden="true"></i></button><button><i class="ti ti-calendar-event" aria-hidden="true"></i>移到其他天</button><button><i class="ti ti-copy" aria-hidden="true"></i>複製</button><button class="del"><i class="ti ti-trash" aria-hidden="true"></i>移除</button></div></div>
+      </article>
+
+      <button class="addcard"><i class="ti ti-plus" aria-hidden="true"></i> 在手帳本貼上新的一站景點<br><span class="meta">搜尋地點或手動輸入，也可以貼上官網連結</span></button>
+    </main>
+
+    <aside>
+      <section class="note" aria-labelledby="tlTitle"><div class="nh"><h3 id="tlTitle"><i class="ti ti-map-2" aria-hidden="true"></i>DAY 03 手帳漫遊足跡</h3><span class="cnt">4 個站點 · 2 段交通</span></div>
+        <div class="nb"><div class="tl">
+          <div class="ti"><div class="r"><span class="t">10:00 – 13:00</span><span class="d">3h</span></div><p class="n">恰圖恰週末市集</p><p class="s">市集打卡 · 不需預約</p><div class="tr"><div class="r"><b><i class="ti ti-car" aria-hidden="true"></i> Grab 叫車（恰圖恰 → 老城區）</b><span class="m">25 分鐘</span></div><p class="s">避開 13:00 塞車 · THB 150 / 車</p></div></div>
+          <div class="ti fixed"><div class="r"><span class="t">13:30 – 15:00 <span class="lock"><i class="ti ti-lock" aria-hidden="true"></i> 固定</span></span><span class="d">已付訂</span></div><p class="n">Jay Fai 蟹肉歐姆蛋</p><p class="s">美味打卡 · 已訂位 4 人</p><div class="tr warn"><div class="r"><b><i class="ti ti-alert-triangle" aria-hidden="true"></i> 尚未設定交通</b><span class="m" style="color:var(--danger)">0 分鐘</span></div><p class="s" style="color:var(--conf-text)">下一站 15:00 緊接開始</p></div></div>
+          <div class="ti cf"><div class="box"><div class="r"><span class="t">15:00 – 16:30（時間衝突）</span><span class="d">無交通時間</span></div><p class="n">TOPKART Bangkok 卡丁車</p><p class="tip"><i class="ti ti-bolt" aria-hidden="true"></i> 上一站為固定時間，可能遲到</p><div class="acts"><button>改為 15:30</button><button>補交通時間</button><button>忽略</button></div></div></div>
+          <div class="ti"><div class="r"><span class="t">19:00 – 21:30</span><span class="d" style="color:#2E4B61">提醒 11/18</span></div><p class="n">Nathong Terrace 河畔晚餐</p><p class="s">河畔晚餐 · 待訂 · 雨天備案</p></div>
+        </div></div>
+      </section>
+
+      <section class="note" aria-labelledby="budTitle"><div class="nh"><h3 id="budTitle"><i class="ti ti-pig-money" aria-hidden="true"></i>曼谷吃喝公費結算包</h3><span class="cnt ok">THB 幣別</span></div>
+        <div class="nb"><p class="meta" style="margin-bottom:10px">4 人均分即時試算</p>
+          <div class="seg" role="group" aria-label="預算單位"><button aria-pressed="true">每人</button><button aria-pressed="false">整團（4 人）</button></div>
+          <div class="big"><div class="r"><span>全程預估 / 人</span><span class="v">THB 9,400</span></div><div class="r"><span class="meta">今日 DAY 03 / 人</span><span class="acc">THB 1,650</span></div></div>
+          <div class="two"><div><i style="background:#2E4B61"></i>已付款<b>THB 2,400</b>Jay Fai 訂金</div><div><i style="background:#B86B45"></i>現場現金預估<b>THB 7,000</b>市集、晚餐、交通</div></div>
+          <div class="bar-r"><span>5 日旅行總預算進度（人均）</span><span>THB 9,400 / 15,000</span></div>
+          <div class="bar" role="progressbar" aria-valuenow="63" aria-valuemin="0" aria-valuemax="100" aria-label="預算使用進度"><div style="width:63%"></div></div>
+          <div class="bar-f"><span class="g"><i class="ti ti-leaf" aria-hidden="true"></i> 已用 63%（掌握良好）</span><span>剩餘 THB 5,600</span></div>
+        </div>
+      </section>
+
+      <section class="note" aria-labelledby="rmTitle"><div class="nh"><h3 id="rmTitle"><i class="ti ti-pin" aria-hidden="true"></i>出發前重要手寫小紙條</h3><span class="cnt">3 項提醒</span></div>
+        <div class="nb">
+          <div class="rm"><i class="dot" style="background:#2E4B61"></i>Nathong 河畔位子 <span class="tag b">11/18 訂位提醒</span></div>
+          <div class="rm"><i class="dot" style="background:#C9733B"></i>TOPKART 時段與交通 <span class="tag o">待 Ken 處理</span></div>
+          <div class="rm"><i class="dot" style="background:#2E4B61"></i>Jay Fai 再次確認訂位 <span class="tag b">11/20 提醒</span></div>
+          <div class="soon"><i class="ti ti-calendar" aria-hidden="true"></i>同步存入手機旅行日曆（.ics）<span class="pl">即將推出</span></div>
+        </div>
+      </section>
+
+      <div class="line"><span class="lg">LINE</span><div class="tx"><b>好友即時手帳共編 <span class="on">3 人在線</span></b><p class="s">Ken 正在編輯 TOPKART 卡丁車</p></div><button class="btn"><i class="ti ti-copy" aria-hidden="true"></i> 複製邀請</button></div>
+    </aside>
+  </div>
+</div>
+</div>
+
+<script>
+/* 原型：配色切換（循環五種）、DAY 分頁切換、預算單位切換 */
+const THEMES=['paper','kraft','peach','sage','ocean'];
+const store={get(k,d){try{return localStorage.getItem(k)||d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+document.body.dataset.theme=store.get('ts-theme','paper');
+document.getElementById('themeBtn').addEventListener('click',()=>{
+  const i=(THEMES.indexOf(document.body.dataset.theme)+1)%THEMES.length;
+  document.body.dataset.theme=THEMES[i];store.set('ts-theme',THEMES[i]);
+});
+document.querySelectorAll('.day[role=tab]').forEach(t=>t.addEventListener('click',()=>{
+  document.querySelectorAll('.day[role=tab]').forEach(x=>x.setAttribute('aria-selected','false'));
+  t.setAttribute('aria-selected','true');
+}));
+document.querySelectorAll('.seg button').forEach(b=>b.addEventListener('click',()=>{
+  b.parentElement.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));
+  b.setAttribute('aria-pressed','true');
+}));
+</script>
+</body>
+</html>
