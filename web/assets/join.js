@@ -71,7 +71,7 @@ function view() {
       <div class="frame"><div class="field">${ic('ti-user-plus')}<input id="nick" maxlength="20" autocomplete="nickname" placeholder="${esc(t('jNickPh'))}" value="${esc(nick.slice(0, 20))}" aria-describedby="nickHint nickErr"></div></div>
       <p class="meta" id="nickHint" style="margin-top:6px">${t('jNickHint')}</p>
       <p class="err" id="nickErr" role="alert">${esc(t('errors').invalid_nickname)}</p>
-      <div class="opt" style="margin-top:14px"><input type="checkbox" id="agree"><label for="agree" class="meta">${t('jAgree')} <a href="privacy.html" target="_blank" rel="noopener">${t('privacyLink')}</a>、<a href="terms.html" target="_blank" rel="noopener">${t('terms')}</a> ${t('jAgree2')} <span class="req">${t('required')}</span></label></div>
+      <div class="opt" style="margin-top:14px"><input type="checkbox" id="agree"><label for="agree" class="meta">${t('jAgree')} <a href="${t('privacyUrl')}" target="_blank" rel="noopener">${t('privacyLink')}</a>${t('legalSep')}<a href="${t('termsUrl')}" target="_blank" rel="noopener">${t('terms')}</a> ${t('jAgree2')} <span class="req">${t('required')}</span></label></div>
       <div class="opt"><input type="checkbox" id="stats" ${CFG.STATS_DEFAULT_CHECKED ? 'checked' : ''}><label for="stats" class="meta">${t('jStats')}</label></div>
       ${CFG.TURNSTILE_SITE_KEY ? '<div id="captcha" style="margin-top:14px"></div>' : ''}
       <button class="cta" type="submit" id="joinBtn" disabled><span class="seal">${esc(t('seal'))}</span><span class="txt" id="joinTxt">${invite.kind === 'view' ? t('jJoinView') : t('jJoin')}</span>${ic('ti-arrow-right')}</button>
