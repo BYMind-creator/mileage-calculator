@@ -1,0 +1,59 @@
+/* 分享按鈕列、QR code、App 內建瀏覽器提示（首頁、加入頁、編輯器共用） */
+.share-sheet{margin:8px 0 4px}
+.sh-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.sh-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:64px;padding:8px 4px;
+  border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:12px var(--sans);text-decoration:none;cursor:pointer;text-align:center}
+.sh-btn:hover{border-color:var(--ink)}
+.sh-btn .ic{font-size:22px}
+.sh-btn.sh-more{border-color:var(--ink);background:var(--ink);color:var(--paper)}
+.sh-btn[aria-expanded=true]{border-color:var(--ink);box-shadow:2px 2px 0 var(--accent)}
+.sh-qr{margin-top:12px;display:flex;gap:14px;align-items:center;flex-wrap:wrap;font:13px/1.6 var(--sans);color:var(--soft)}
+.sh-qr-img{width:160px;height:160px;background:#fff;border:1.5px solid var(--ink);padding:6px;flex:none}
+.sh-qr-img svg{width:100%;height:100%;display:block}
+.sh-qr p{flex:1;min-width:160px;display:flex;gap:6px;align-items:center}
+
+.inapp-bar{background:#FFF6E0;border-bottom:1px solid #E0B85A;font:14px/1.6 var(--sans);color:#5A3E0A}
+.inapp-bar .wrap{display:flex;gap:12px;align-items:center;padding:10px 16px;flex-wrap:wrap;max-width:1200px;margin:0 auto}
+.inapp-bar b{background:#5A3E0A;color:#fff;font:600 11px var(--sans);padding:3px 6px;border-radius:3px;flex:none}
+.inapp-bar p{flex:1;min-width:200px;margin:0}
+.inapp-bar a,.inapp-bar button{background:#5A3E0A;color:#fff;text-decoration:none;font:500 13px var(--sans);padding:8px 14px;border:0;border-radius:4px;white-space:nowrap;display:inline-flex;gap:6px;align-items:center;cursor:pointer}
+
+/* ===== 登入對話框 ===== */
+dialog.auth-dlg{border:1.5px solid var(--ink);background:var(--card);color:var(--ink);padding:0;width:min(420px,calc(100vw - 24px));max-height:calc(100vh - 32px);overflow:auto;box-shadow:6px 6px 0 var(--line)}
+dialog.auth-dlg::backdrop{background:rgba(48,42,37,.45)}
+.auth-h{position:relative;padding:18px 48px 4px 20px}
+.auth-h .mono{font:12px var(--mono);color:var(--soft);letter-spacing:.08em}
+.auth-h h2{font:600 22px var(--serif);margin:4px 0 0}
+.auth-x{position:absolute;right:10px;top:12px;width:36px;height:36px;border:0;background:none;color:var(--soft);font-size:20px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.auth-sub{padding:4px 20px 12px;font:14px/1.7 var(--sans);color:var(--soft);margin:0}
+.auth-list,.auth-form{padding:0 20px;display:flex;flex-direction:column;gap:10px}
+.auth-btn{display:flex;align-items:center;gap:12px;min-height:48px;padding:0 16px;border:1.5px solid var(--ink);background:var(--card);color:var(--ink);font:500 15px var(--sans);cursor:pointer;text-align:left}
+.auth-btn:hover{box-shadow:3px 3px 0 var(--accent)}
+.auth-btn .ic{font-size:22px;flex:none}
+.auth-note{margin:0 20px 12px;padding:8px 10px;background:#FFF6E0;border:1px solid #E0B85A;font:13px/1.6 var(--sans);color:#5A3E0A}
+.auth-form .auth-note{margin:0}
+.auth-label{font:500 13px var(--sans);color:var(--soft)}
+.auth-inp{height:48px;border:1.5px solid var(--ink);background:#fff;padding:0 12px;font:16px var(--sans);color:var(--ink);width:100%;box-sizing:border-box}
+.auth-code{font:600 24px var(--mono);letter-spacing:.3em;text-align:center}
+.auth-primary{height:48px;border:0;background:var(--ink);color:var(--paper);font:500 15px var(--sans);cursor:pointer;box-shadow:3px 3px 0 var(--accent)}
+.auth-link{background:none;border:0;color:var(--ink);text-decoration:underline;font:14px var(--sans);cursor:pointer;padding:6px 0;align-self:flex-start}
+.auth-link:disabled{color:var(--soft);text-decoration:none;cursor:default}
+.auth-row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.auth-captcha{min-height:65px}
+.auth-err{margin:10px 20px 0;color:var(--danger);font:14px/1.6 var(--sans)}
+.auth-foot{padding:14px 20px 18px;font:12px/1.6 var(--sans);color:var(--soft);margin:0}
+.auth-foot a{color:var(--ink)}
+.auth-dlg .busy{opacity:.6;pointer-events:none}
+
+/* 首頁「邀請旅伴」下拉面板裡的分享按鈕：蓋過選單項目的樣式 */
+.panel.inv-panel{min-width:300px}
+.panel .sh-btn{flex-direction:column;justify-content:center;gap:4px;width:auto;border:1.5px solid var(--line);background:var(--card);padding:8px 4px;font:12px var(--sans);text-align:center}
+.panel .sh-btn:hover{background:var(--card);border-color:var(--ink)}
+.panel .sh-btn.sh-more{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.panel .sh-row{grid-template-columns:repeat(3,1fr)}
+.panel .sh-qr-img{width:132px;height:132px}
+@media (max-width:480px){.panel.inv-panel{min-width:min(300px,calc(100vw - 48px))}}
+
+/* 手機驗證碼：國碼＋號碼 */
+.auth-phone{display:grid;grid-template-columns:minmax(0,132px) minmax(0,1fr);gap:8px}
+.auth-cc{padding:0 6px;font-size:15px}
