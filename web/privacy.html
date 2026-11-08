@@ -5,29 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>隱私權政策｜Travel Studio</title>
 <style>
-:root{--bg:#f1e9db;--paper:#fffaf2;--text:#594735;--muted:#7d6d5d;--line:#d5c6b0;--green:#243c31}
+:root{--bg:#F8F4E9;--paper:#FFFDF8;--text:#302A25;--muted:#7d6d5d;--line:#d5c6b0;--ink:#302A25;--accent:#B86B45}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(#c9bba9 0.7px,transparent 0.8px) 0 0/24px 24px,var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;color:var(--text);line-height:1.85}
+body{margin:0;background:radial-gradient(rgba(48,42,37,.2) 0.7px,transparent 0.8px) 0 0/22px 22px,var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;color:var(--text);line-height:1.85}
 .page{max-width:850px;margin:50px auto;padding:64px 76px 74px;background:var(--paper);border:1px solid #cbb89b;box-shadow:8px 9px 0 #d8c8af,0 15px 35px #45321e1a;position:relative}
 .page::before{content:"";position:absolute;width:115px;height:22px;background:repeating-linear-gradient(45deg,#dbc8a57f 0 5px,#e9d9b47f 5px 10px);border:1px solid #cbb89b80;top:-12px;left:calc(50% - 57px);transform:rotate(-2deg)}
-.brand{font-family:Georgia,serif;color:var(--green);font-size:22px;font-weight:bold;letter-spacing:-.02em}
-.kicker{font:700 12px Georgia,serif;letter-spacing:.2em;color:#997956;margin:20px 0 14px}
-article h2:first-child{font:700 clamp(28px,4.6vw,40px)/1.35 Georgia,"Noto Serif TC",serif;color:var(--green);margin:0 0 12px}
-article h3{font-size:21px;color:var(--green);padding-bottom:8px;border-bottom:1px solid var(--line);margin:38px 0 14px}
-article h4{font-size:16px;color:#8a6241;margin:25px 0 8px}
+.topbar{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.brand{font-family:Georgia,"Noto Serif TC",serif;color:var(--ink);font-size:22px;font-weight:bold;letter-spacing:-.02em;text-decoration:none;display:inline-block}
+.brand:hover{text-decoration:underline}
+.lang{font-size:13px;color:var(--muted);text-decoration:none;border:1px solid var(--line);padding:3px 10px}
+.lang:hover{color:var(--ink);border-color:var(--ink)}
+.kicker{font:700 12px/1.6 "Noto Sans TC",sans-serif;letter-spacing:.2em;color:var(--accent);margin:20px 0 14px}
+article h2:first-child{font:700 clamp(28px,4.6vw,40px)/1.35 Georgia,"Noto Serif TC",serif;color:var(--ink);margin:0 0 12px}
+article h3{font-size:21px;color:var(--ink);padding-bottom:8px;border-bottom:1px solid var(--line);margin:38px 0 14px}
+article h4{font-size:16px;color:var(--accent);margin:25px 0 8px}
 article p{font-size:15px;text-align:justify;margin:12px 0;overflow-wrap:anywhere}
 article ol,article ul{padding-left:25px}
 article li{font-size:15px;margin:5px 0;overflow-wrap:anywhere}
-article strong{color:#5e4630}
-.footer{border-top:1px dashed #bcae96;margin-top:50px;padding-top:18px;text-align:center;font:12px Georgia,serif;color:var(--muted);letter-spacing:.06em}
+article strong{color:var(--ink)}
+.prevail{margin-top:34px;padding:12px 14px;border:1px dashed var(--line);font-size:13px;color:var(--muted)}
+.footer{border-top:1px dashed #bcae96;margin-top:50px;padding-top:18px;text-align:center;font:12px/2 "Noto Sans TC",sans-serif;color:var(--muted);letter-spacing:.06em}
+.footer a{color:var(--ink)}
 @media(max-width:680px){.page{margin:20px 12px 35px;padding:48px 21px 42px;box-shadow:4px 5px 0 #d8c8af}article p,article li{font-size:14px}article h3{font-size:19px}}
-@media print{@page{size:A4;margin:17mm}body{background:#fff}.page{max-width:none;margin:0;padding:0;border:none;box-shadow:none}.page::before{display:none}article h3,article h4{break-after:avoid}article li{break-inside:avoid}}
+@media print{@page{size:A4;margin:17mm}body{background:#fff}.page{max-width:none;margin:0;padding:0;border:none;box-shadow:none}.page::before{display:none}.lang,.footer a{display:none}article h3,article h4{break-after:avoid}article li{break-inside:avoid}}
 </style>
 </head>
 <body>
 <main class="page">
-<div class="brand">Travel Studio</div>
-<div class="kicker">PRIVACY POLICY · 2026-11-09</div>
+<div class="topbar"><a class="brand" href="index.html">Travel Studio</a><a class="lang" href="privacy-en.html" lang="en">English</a></div>
+<div class="kicker">隱私權政策 · 2026-11-09</div>
 <article><h2>Travel Studio 隱私權政策</h2>
 <p><strong>條款版本：2026-11-09</strong></p>
 <h3>前言</h3>
@@ -124,8 +130,10 @@ article strong{color:#5e4630}
 <h3>第十二條　未成年人保護</h3>
 <p>本服務主要提供具有相應法律行為能力的人使用。未滿 18 歲者應依中華民國法律，由法定代理人提供必要同意或協助。使用者應避免公開未成年人的詳細旅行日期、住宿位置及其他可識別的行蹤資料；如有違規或涉及未成年人權益之檢舉，本平台將依適用法律採取適當措施。</p>
 <h3>第十三條　政策修改</h3>
-<p>本政策可能因功能、資料用途或法律調整而更新。本平台將公布新版、生效日及必要的差異說明；涉及新目的或依法應取得同意的處理，將在實施前另行徵求必要同意。政策聯絡與權利申請請使用本網站正式公布的「聯絡我們」入口。</p></article>
-<footer class="footer">TRAVEL STUDIO · 隱私權政策 · 2026-11-09</footer>
+<p>本政策可能因功能、資料用途或法律調整而更新。本平台將公布新版、生效日及必要的差異說明；涉及新目的或依法應取得同意的處理，將在實施前另行徵求必要同意。政策聯絡與權利申請請使用本網站正式公布的「聯絡我們」入口。</p>
+<div class="prevail">本政策以繁體中文及英文公布，英文版僅供參考；兩者如有歧義或不一致，以中文版為準。</div>
+</article>
+<footer class="footer">Travel Studio · 隱私權政策 · 2026-11-09<br><a href="index.html">← 回 Travel Studio</a> · <a href="terms.html">服務條款</a> · <a href="privacy-en.html" lang="en">English</a></footer>
 </main>
 </body>
 </html>
