@@ -5,29 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>服務條款｜Travel Studio</title>
 <style>
-:root{--bg:#f1e9db;--paper:#fffaf2;--text:#594735;--muted:#7d6d5d;--line:#d5c6b0;--green:#243c31}
+:root{--bg:#F8F4E9;--paper:#FFFDF8;--text:#302A25;--muted:#7d6d5d;--line:#d5c6b0;--ink:#302A25;--accent:#B86B45}
 *{box-sizing:border-box}
-body{margin:0;background:radial-gradient(#c9bba9 0.7px,transparent 0.8px) 0 0/24px 24px,var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;color:var(--text);line-height:1.85}
+body{margin:0;background:radial-gradient(rgba(48,42,37,.2) 0.7px,transparent 0.8px) 0 0/22px 22px,var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;color:var(--text);line-height:1.85}
 .page{max-width:850px;margin:50px auto;padding:64px 76px 74px;background:var(--paper);border:1px solid #cbb89b;box-shadow:8px 9px 0 #d8c8af,0 15px 35px #45321e1a;position:relative}
 .page::before{content:"";position:absolute;width:115px;height:22px;background:repeating-linear-gradient(45deg,#dbc8a57f 0 5px,#e9d9b47f 5px 10px);border:1px solid #cbb89b80;top:-12px;left:calc(50% - 57px);transform:rotate(-2deg)}
-.brand{font-family:Georgia,serif;color:var(--green);font-size:22px;font-weight:bold;letter-spacing:-.02em}
-.kicker{font:700 12px Georgia,serif;letter-spacing:.2em;color:#997956;margin:20px 0 14px}
-article h2:first-child{font:700 clamp(28px,4.6vw,40px)/1.35 Georgia,"Noto Serif TC",serif;color:var(--green);margin:0 0 12px}
-article h3{font-size:21px;color:var(--green);padding-bottom:8px;border-bottom:1px solid var(--line);margin:38px 0 14px}
-article h4{font-size:16px;color:#8a6241;margin:25px 0 8px}
+.topbar{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.brand{font-family:Georgia,"Noto Serif TC",serif;color:var(--ink);font-size:22px;font-weight:bold;letter-spacing:-.02em;text-decoration:none;display:inline-block}
+.brand:hover{text-decoration:underline}
+.lang{font-size:13px;color:var(--muted);text-decoration:none;border:1px solid var(--line);padding:3px 10px}
+.lang:hover{color:var(--ink);border-color:var(--ink)}
+.kicker{font:700 12px/1.6 "Noto Sans TC",sans-serif;letter-spacing:.2em;color:var(--accent);margin:20px 0 14px}
+article h2:first-child{font:700 clamp(28px,4.6vw,40px)/1.35 Georgia,"Noto Serif TC",serif;color:var(--ink);margin:0 0 12px}
+article h3{font-size:21px;color:var(--ink);padding-bottom:8px;border-bottom:1px solid var(--line);margin:38px 0 14px}
+article h4{font-size:16px;color:var(--accent);margin:25px 0 8px}
 article p{font-size:15px;text-align:justify;margin:12px 0;overflow-wrap:anywhere}
 article ol,article ul{padding-left:25px}
 article li{font-size:15px;margin:5px 0;overflow-wrap:anywhere}
-article strong{color:#5e4630}
-.footer{border-top:1px dashed #bcae96;margin-top:50px;padding-top:18px;text-align:center;font:12px Georgia,serif;color:var(--muted);letter-spacing:.06em}
+article strong{color:var(--ink)}
+.prevail{margin-top:34px;padding:12px 14px;border:1px dashed var(--line);font-size:13px;color:var(--muted)}
+.footer{border-top:1px dashed #bcae96;margin-top:50px;padding-top:18px;text-align:center;font:12px/2 "Noto Sans TC",sans-serif;color:var(--muted);letter-spacing:.06em}
+.footer a{color:var(--ink)}
 @media(max-width:680px){.page{margin:20px 12px 35px;padding:48px 21px 42px;box-shadow:4px 5px 0 #d8c8af}article p,article li{font-size:14px}article h3{font-size:19px}}
-@media print{@page{size:A4;margin:17mm}body{background:#fff}.page{max-width:none;margin:0;padding:0;border:none;box-shadow:none}.page::before{display:none}article h3,article h4{break-after:avoid}article li{break-inside:avoid}}
+@media print{@page{size:A4;margin:17mm}body{background:#fff}.page{max-width:none;margin:0;padding:0;border:none;box-shadow:none}.page::before{display:none}.lang,.footer a{display:none}article h3,article h4{break-after:avoid}article li{break-inside:avoid}}
 </style>
 </head>
 <body>
 <main class="page">
-<div class="brand">Travel Studio</div>
-<div class="kicker">TERMS OF SERVICE · 2026-11-09</div>
+<div class="topbar"><a class="brand" href="index.html">Travel Studio</a><a class="lang" href="terms-en.html" lang="en">English</a></div>
+<div class="kicker">服務條款 · 2026-11-09</div>
 <article><h2>Travel Studio 服務條款</h2>
 <p><strong>條款版本：2026-11-09</strong></p>
 <h3>前言</h3>
@@ -117,8 +123,10 @@ article strong{color:#5e4630}
 <h3>第十七條　條款變更與接受</h3>
 <p>本條款更新時，本平台將公告版本、生效日期及重要內容；涉及重大修改或依法需重新取得同意者，將於適用前提供相應確認程序。建立者與匿名協作者均依前言所載加入時點接受必要條款；需要分項授權的統計、內容再利用及商業宣傳，不以繼續使用服務代替依法應有的同意。</p>
 <h3>第十八條　準據法與爭議處理</h3>
-<p>本條款的解釋與相關爭議，原則上適用中華民國（臺灣）法律。雙方應優先透過合理方式協商；如須訴訟，除法律另有強制規定外，以臺灣臺北地方法院為第一審管轄法院。本條不限制消費者依強制法律享有的權利。</p></article>
-<footer class="footer">TRAVEL STUDIO · 服務條款 · 2026-11-09</footer>
+<p>本條款的解釋與相關爭議，原則上適用中華民國（臺灣）法律。雙方應優先透過合理方式協商；如須訴訟，除法律另有強制規定外，以臺灣臺北地方法院為第一審管轄法院。本條不限制消費者依強制法律享有的權利。</p>
+<div class="prevail">本條款以繁體中文及英文公布，英文版僅供參考；兩者如有歧義或不一致，以中文版為準。</div>
+</article>
+<footer class="footer">Travel Studio · 服務條款 · 2026-11-09<br><a href="index.html">← 回 Travel Studio</a> · <a href="privacy.html">隱私權政策</a> · <a href="terms-en.html" lang="en">English</a></footer>
 </main>
 </body>
 </html>
