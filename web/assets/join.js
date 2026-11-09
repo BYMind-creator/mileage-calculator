@@ -72,7 +72,7 @@ function view() {
       <p class="meta" id="nickHint" style="margin-top:6px">${t('jNickHint')}</p>
       <p class="err" id="nickErr" role="alert">${esc(t('errors').invalid_nickname)}</p>
       <div class="opt" style="margin-top:14px"><input type="checkbox" id="agree"><label for="agree" class="meta">${t('jAgree')} <a href="${t('privacyUrl')}" target="_blank" rel="noopener">${t('privacyLink')}</a>${t('legalSep')}<a href="${t('termsUrl')}" target="_blank" rel="noopener">${t('terms')}</a> ${t('jAgree2')} <span class="req">${t('required')}</span></label></div>
-      <div class="opt"><input type="checkbox" id="stats" ${CFG.STATS_DEFAULT_CHECKED ? 'checked' : ''}><label for="stats" class="meta">${t('jStats')}</label></div>
+      <div class="opt"><input type="checkbox" id="stats"><label for="stats" class="meta">${t('jStats')}</label></div>
       ${CFG.TURNSTILE_SITE_KEY ? '<div id="captcha" style="margin-top:14px"></div>' : ''}
       <button class="cta" type="submit" id="joinBtn" disabled><span class="seal">${esc(t('seal'))}</span><span class="txt" id="joinTxt">${invite.kind === 'view' ? t('jJoinView') : t('jJoin')}</span>${ic('ti-arrow-right')}</button>
       ${!(session && !session.user.is_anonymous) ? `<p class="meta" style="margin-top:12px"><button type="button" class="inline-link" id="acctJoin">${ic('ti-login-2')} ${t('jHaveGoogle')}</button></p>` : ''}
