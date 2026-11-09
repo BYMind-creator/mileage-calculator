@@ -125,7 +125,7 @@ async function signOut() {
 let consentNext = null;
 function askConsent(next) {
   consentNext = next || null;
-  $('cStat').checked = !!CFG.STATS_DEFAULT_CHECKED; $('cMkt').checked = false;
+  $('cStat').checked = !!CFG.STATS_DEFAULT_CHECKED; 
   $('consentDlg').showModal();
 }
 $('cAgree').addEventListener('click', async () => {
@@ -545,8 +545,9 @@ async function resumePending() {
 function render() {
   document.documentElement.lang = lang === 'zh' ? 'zh-Hant' : 'en';
   document.body.dataset.theme = theme;
-  document.querySelectorAll('[data-i]').forEach(el => { const v = t(el.dataset.i); if (typeof v === 'string') el.textContent = v; });
-  document.querySelectorAll('[data-i-label]').forEach(el => el.setAttribute('aria-label', t(el.dataset.iLabel)));
+   document.querySelectorAll('[data-i]').forEach(el => { const v = t(el.dataset.i); if (typeof v === 'string') el.textContent = v; });
+   document.querySelectorAll('[data-i-label]').forEach(el => el.setAttribute('aria-label', t(el.dataset.iLabel)));
+   document.querySelectorAll('[data-i-href]').forEach(el => { el.href = t(el.dataset.iHref); });
   $('dispatch').textContent = `${t('dispatch')} ${today.getFullYear()}-001`;
   $('stampBottom').textContent = t('stampBottom')(today.getFullYear());
   destEl.placeholder = t('phDest');
