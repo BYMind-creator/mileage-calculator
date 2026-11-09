@@ -125,7 +125,7 @@ async function signOut() {
 let consentNext = null;
 function askConsent(next) {
   consentNext = next || null;
-  $('cStat').checked = !!CFG.STATS_DEFAULT_CHECKED; 
+  $('cStat').checked = false; $('cMkt').checked = false;
   $('consentDlg').showModal();
 }
 $('cAgree').addEventListener('click', async () => {
