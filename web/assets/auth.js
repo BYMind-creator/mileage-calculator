@@ -35,7 +35,7 @@ const L = {
     emailLabel: 'Email', emailPh: 'you@example.com', send: 'Send code', back: 'Other options',
     codeSent: e => `We sent a code to ${e}. It expires in 10 minutes. Check your spam folder if you don't see it.`, codeLabel: 'Code', verify: 'Sign in', verifyLink: 'Link',
     resend: 'Resend', resendIn: s => `Resend in ${s}s`, changeEmail: 'Use a different email',
-    foot: 'By continuing you agree to the', terms: 'Terms', privacy: 'Privacy Policy', and: 'and', termsUrl: 'terms-en.html', privacyUrl: 'privacy-en.html',
+    foot: 'By continuing you agree to the ', terms: 'Terms', privacy: 'Privacy Policy', and: ' and ', termsUrl: 'terms-en.html', privacyUrl: 'privacy-en.html',
     errBadEmail: "That email doesn't look right.", errBadCode: "That code is wrong or expired. Try again or resend.", errTooMany: 'Too many tries. Wait a minute and try again.',
     errEmailTaken: 'That email already has an account. Sign out of guest mode, then sign in with it (your guest edits stay on the trip).',
     errIdentityTaken: "That account is already linked to someone else. Sign in with it directly.", errCaptcha: 'Please complete the verification below.',
@@ -49,8 +49,8 @@ const META = {
   email: { icon: 'ti-mail', color: 'currentColor' },
   sms: { icon: 'ti-device-mobile-message', color: 'currentColor' }
 };
-// 國碼：香港、台灣、澳門優先；trunk＝當地撥號前面的 0，國際格式要拿掉
-const CC = [['+852', '香港 HK', 8, 8, false], ['+886', '台灣 TW', 9, 9, true], ['+853', '澳門 MO', 8, 8, false], ['+86', '中國 CN', 11, 11, false],
+// 國碼：台灣優先；trunk＝當地撥號前面的 0，國際格式要拿掉
+const CC = [['+886', '台灣 TW', 9, 9, true], ['+852', '香港 HK', 8, 8, false], ['+853', '澳門 MO', 8, 8, false], ['+86', '中國 CN', 11, 11, false],
   ['+65', '新加坡 SG', 8, 8, false], ['+60', '馬來西亞 MY', 9, 10, true], ['+81', '日本 JP', 10, 10, true], ['+82', '韓國 KR', 9, 10, true],
   ['+66', '泰國 TH', 9, 9, true], ['+1', 'US / CA', 10, 10, false], ['+44', 'UK', 10, 10, true], ['+61', 'AU', 9, 9, true]];
 function defaultCc() {
@@ -59,7 +59,7 @@ function defaultCc() {
   if (tz === 'Asia/Hong_Kong' || lg === 'zh-hk') return '+852';
   if (tz === 'Asia/Macau' || lg === 'zh-mo') return '+853';
   if (tz === 'Asia/Taipei' || lg === 'zh-tw') return '+886';
-  return '+852';
+  return '+886';
 }
 function normPhone(cc, raw) {
   const c = CC.find(x => x[0] === cc); let d = String(raw || '').replace(/\D/g, '');
@@ -152,7 +152,7 @@ function view() {
       <button type="button" class="auth-x" data-auth="close" aria-label="${x.close}">${ic('ti-x')}</button></div>
     <p class="auth-sub">${o.link ? x.subLink : x.subIn}</p>
     ${body}<p class="auth-err" role="alert" hidden></p>
-    <p class="auth-foot">${x.foot} <a href="${x.termsUrl}" target="_blank" rel="noopener">${x.terms}</a> ${x.and} <a href="${x.privacyUrl}" target="_blank" rel="noopener">${x.privacy}</a></p>`;
+    <p class="auth-foot">${x.foot}<a href="${x.termsUrl}" target="_blank" rel="noopener">${x.terms}</a>${x.and}<a href="${x.privacyUrl}" target="_blank" rel="noopener">${x.privacy}</a></p>`;
   if (step === 'email') { mountCaptcha(); dlg.querySelector('#authEmail').focus(); }
   if (step === 'phone') { mountCaptcha(); dlg.querySelector('#authPhone').focus(); }
   if (step === 'code' || step === 'pcode') dlg.querySelector('#authCode').focus();
